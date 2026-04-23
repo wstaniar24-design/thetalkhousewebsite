@@ -62,38 +62,40 @@ collections:
 
   - name: "shows"
     label: "Shows"
-    folder: "_data/shows"
-    create: true
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
-    identifier_field: "venue"
+    file: "_data/shows.json"
     fields:
-      - { label: "Date", name: "date", widget: "datetime", date_format: "MMM DD, YYYY", time_format: false }
-      - { label: "Venue", name: "venue", widget: "string" }
-      - { label: "City", name: "city", widget: "string" }
-      - { label: "Tickets URL", name: "tickets_url", widget: "string", required: false }
-      - label: "Status"
-        name: "status"
-        widget: "select"
-        default: "live"
-        options:
-          - { label: "Live (visible on site)", value: "live" }
-          - { label: "Draft (hidden)", value: "draft" }
+      - label: "Shows"
+        name: "shows"
+        widget: "list"
+        fields:
+          - { label: "Date", name: "date", widget: "datetime", date_format: "MMM DD, YYYY", time_format: false }
+          - { label: "Venue", name: "venue", widget: "string" }
+          - { label: "City", name: "city", widget: "string" }
+          - { label: "Tickets URL", name: "tickets_url", widget: "string", required: false }
+          - label: "Status"
+            name: "status"
+            widget: "select"
+            default: "live"
+            options:
+              - { label: "Live (visible on site)", value: "live" }
+              - { label: "Draft (hidden)", value: "draft" }
 
   - name: "merch"
     label: "Merch"
-    folder: "_data/merch"
-    create: true
-    slug: "{{slug}}"
-    identifier_field: "name"
+    file: "_data/merch.json"
     fields:
-      - { label: "Item Name", name: "name", widget: "string" }
-      - { label: "Price", name: "price", widget: "number", value_type: "float", step: 0.01 }
-      - label: "Category"
-        name: "category"
-        widget: "select"
-        options:
-          - { label: "Apparel", value: "apparel" }
-          - { label: "Music", value: "music" }
-          - { label: "Misc", value: "misc" }
-      - { label: "Photo", name: "image", widget: "image", required: false }
-      - { label: "Buy Link", name: "buy_link", widget: "string", required: false }
+      - label: "Merch Items"
+        name: "items"
+        widget: "list"
+        fields:
+          - { label: "Item Name", name: "name", widget: "string" }
+          - { label: "Price", name: "price", widget: "number", value_type: "float", step: 0.01 }
+          - label: "Category"
+            name: "category"
+            widget: "select"
+            options:
+              - { label: "Apparel", value: "apparel" }
+              - { label: "Music", value: "music" }
+              - { label: "Misc", value: "misc" }
+          - { label: "Photo", name: "image", widget: "image", required: false }
+          - { label: "Buy Link", name: "buy_link", widget: "string", required: false }
