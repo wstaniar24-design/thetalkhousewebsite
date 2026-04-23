@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Talkhouse</title>
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,600&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f5f5f5;
+      --bg2: #e0e0e0;
+      --ink: #111111;
+      --muted: #666666;
+      --accent: #7a1a1a;
+      --accent2: #5c1111;
+      --border: #cccccc;
+      --card-bg: #ffffff;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--ink); font-family: 'IBM Plex Mono', monospace; font-size: 14px; line-height: 1.6; }
+
+    /* ── NAV ── */
+    nav { position: sticky; top: 0; z-index: 100; background: var(--ink); color: var(--bg); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; height: 54px; border-bottom: 2px solid var(--accent); }
+    .nav-logo { font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif; font-size: 1.4rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--bg); text-decoration: none; white-space: nowrap; }
+    .nav-links { display: flex; gap: 0; list-style: none; align-items: center; height: 100%; }
+    .nav-links li { position: relative; height: 100%; display: flex; align-items: center; }
+    .nav-links a, .nav-links button { color: var(--bg); text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 0 1.1rem; height: 100%; display: flex; align-items: center; background: none; border: none; cursor: pointer; transition: color 0.15s, background 0.15s; }
+    .nav-links a:hover, .nav-links button:hover { color: var(--accent); }
+    .dropdown { position: relative; }
+    .dropdown-menu { display: none; position: absolute; top: 100%; left: 0; background: var(--ink); border: 1px solid var(--accent); border-top: none; min-width: 140px; z-index: 200; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .dropdown-menu a { display: block; height: auto; padding: 0.6rem 1.1rem; font-size: 0.68rem; border-bottom: 1px solid #2a2520; }
+    .dropdown-menu a:last-child { border-bottom: none; }
+    .listen-btn { display: inline-block; font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif; font-size: 0.85rem; letter-spacing: 0.18em; text-transform: uppercase; color: #fff; background: var(--accent); border: 2px solid var(--accent); padding: 0.45rem 1.3rem; border-radius: 999px; text-decoration: none; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+    .listen-btn:hover { background: transparent; color: #fff; border-color: #fff; }
+
+    /* ── HERO ── */
+    #home { position: relative; width: 100%; aspect-ratio: 16/7; overflow: hidden; background: var(--ink); display: flex; align-items: flex-end; }
+    .hero-slideshow { position: absolute; inset: 0; z-index: 0; }
+    .hero-slide { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.2s ease-in-out; }
+    .hero-slide.active { opacity: 0.92; }
+    .hero-placeholder { position: absolute; inset: 0; background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 40%, #2a0505 100%); display: flex; align-items: center; justify-content: center; }
+    .hero-placeholder-text { font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif; font-size: clamp(5rem, 18vw, 16rem); color: rgba(255,255,255,0.07); letter-spacing: 0.08em; text-transform: uppercase; text-align: center; padding: 1rem; line-height: 1; user-select: none; }
+    .hero-overlay { position: relative; z-index: 2; padding: 2.5rem 3rem; width: 100%; }
+    .hero-tag { display: inline-block; background: var(--accent); color: #fff; font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; padding: 0.3rem 0.8rem; margin-bottom: 1rem; }
+    .hero-title { font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif; font-size: clamp(5rem, 12vw, 10rem); color: var(--bg); line-height: 0.9; letter-spacing: 0.06em; text-transform: uppercase; text-shadow: 0 2px 20px rgba(0,0,0,0.5); }
+    .hero-sub { margin-top: 0.6rem; color: rgba(240,235,227,0.7); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; }
+
+    /* ── SECTIONS ── */
+    .section-header { display: flex; align-items: center; gap: 1rem; padding: 3rem 2.5rem 1.5rem; }
+    .section-label { font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif; font-size: 2.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); }
+    .section-line { flex: 1; height: 1px; background: var(--border); }
+
+    /* ── MERCH ── */
+    #merch { background: var(--bg); padding-bottom: 4rem; }
+    .merch-filter { display: flex; gap: 0.5rem; padding: 0 2.5rem 1.5rem; flex-wrap: wrap; }
+    .filter-btn { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; border: 1px solid var(--border); background: none; color: var(--muted); padding: 0.35rem 0.9rem; cursor: pointer; transition: all 0.15s; }
+    .filter-btn:hover, .filter-btn.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    .merch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5px; padding: 0 2.5rem; background: var(--border); }
+    .merch-card { background: var(--card-bg); cursor: pointer; transition: transform 0.2s; position: relative; overflow: hidden; }
+    .merch-card.hidden { display: none; }
+    .merch-card:hover { transform: translateY(-3px); z-index: 2; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+    .merch-img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: var(--bg2); filter: grayscale(10%); }
+    .merch-img-placeholder { width: 100%; aspect-ratio: 1; background: var(--bg2); display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: var(--border); letter-spacing: 0.1em; text-transform: uppercase; }
+    .merch-info { padding: 0.9rem 1rem; border-top: 1px solid var(--border); }
+    .merch-name { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.05em; color: var(--ink); margin-bottom: 0.3rem; line-height: 1.3; }
+    .merch-price { font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif; font-size: 1rem; color: var(--accent); }
+
+    /* ── MUSIC ── */
+    #music { background: var(--ink); padding: 4rem 2.5rem; color: var(--bg); }
+    .music-inner { max-width: 900px; margin: 0 auto; }
+    .music-section-label { font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif; font-size: 2.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--bg); margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem; }
+    .music-section-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.15); }
+    .discography { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
+    .album-card { cursor: pointer; transition: transform 0.2s; }
+    .album-card:hover { transform: translateY(-4px); }
+    .coming-soon-badge { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif; font-size: 1.4rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.6); border: 1px dashed rgba(255,255,255,0.2); }
+    .album-art { width: 100%; aspect-ratio: 1; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.25); margin-bottom: 0.8rem; position: relative; overflow: hidden; }
+    .album-art img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .album-year { font-size: 0.6rem; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.25rem; }
+    .album-title { font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif; font-size: 1.2rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bg); line-height: 1.1; }
+    .album-format { font-size: 0.6rem; color: rgba(240,235,227,0.45); margin-top: 0.2rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .video-wrapper { position: relative; aspect-ratio: 16/9; background: #000; border: 1px solid rgba(255,255,255,0.08); }
+    .video-placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; color: rgba(240,235,227,0.35); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: color 0.2s; }
+    .video-placeholder:hover { color: rgba(240,235,227,0.7); }
+    .play-icon { width: 56px; height: 56px; border: 1.5px solid currentColor; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .play-icon::after { content: ''; width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-left: 18px solid currentColor; margin-left: 4px; }
+    .video-wrapper iframe { width: 100%; height: 100%; border: none; }
+    .video-caption { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(240,235,227,0.3); margin-top: 0.8rem; }
+
+    /* ── SHOWS ── */
+    #shows { padding-bottom: 4rem; }
+    .tour-inner { padding: 0 2.5rem; }
+    .tour-list { border-top: 1px solid var(--border); }
+    .tour-row { display: flex; align-items: center; gap: 2rem; padding: 1.2rem 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .tour-date { font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif; font-size: 1.1rem; letter-spacing: 0.08em; color: var(--accent); min-width: 130px; }
+    .tour-venue { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em; }
+    .tour-city { font-size: 0.68rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0.15rem; }
+    .tickets-btn { margin-left: auto; display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; border: 1px solid var(--ink); color: var(--ink); text-decoration: none; padding: 0.4rem 1.1rem; transition: all 0.15s; }
+    .tickets-btn:hover { background: var(--ink); color: var(--bg); }
+    .tour-empty { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; padding: 2rem 0; }
+
+    /* ── ABOUT ── */
+    #about { background: var(--bg2); padding-bottom: 4rem; }
+    .about-inner { padding: 0 2.5rem; display: grid; gap: 3rem; }
+    .about-band-name { font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif; font-size: 2rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); margin-bottom: 1rem; }
+    .about-bio p { color: var(--ink); font-size: 0.82rem; line-height: 1.8; margin-bottom: 1rem; }
+    .about-bio p:last-child { margin-bottom: 0; }
+    .social-links { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+    .social-link { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); text-decoration: none; border: 1px solid var(--border); padding: 0.4rem 0.9rem; transition: all 0.15s; }
+    .social-link:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+    /* ── NEWSLETTER ── */
+    .newsletter { background: var(--accent); padding: 3rem 2.5rem; }
+    .newsletter-label { font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 0.5rem; }
+    .newsletter-title { font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif; font-size: 1.8rem; letter-spacing: 0.06em; color: #fff; margin-bottom: 1.5rem; line-height: 1.15; }
+    .newsletter-form { display: flex; gap: 0; max-width: 460px; }
+    .newsletter-input { flex: 1; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.3); border-right: none; color: #fff; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; padding: 0.65rem 1rem; outline: none; }
+    .newsletter-input::placeholder { color: rgba(255,255,255,0.45); }
+    .newsletter-submit { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; background: #fff; color: var(--accent); border: none; padding: 0.65rem 1.3rem; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+    .newsletter-submit:hover { background: rgba(255,255,255,0.85); }
+
+    /* ── FOOTER ── */
+    footer { background: var(--ink); color: var(--muted); padding: 1.5rem 2.5rem; display: flex; align-items: center; justify-content: space-between; }
+    .footer-copy { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; }
+
+    /* ── MODAL ── */
+    #coming-soon-modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.75); align-items: center; justify-content: center; }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <a href="#home" class="nav-logo">Talkhouse</a>
+  <ul class="nav-links">
+    <li><a href="#merch">Merch</a></li>
+    <li><a href="#music">Music</a></li>
+    <li><a href="#shows">Shows</a></li>
+    <li><a href="#about">About</a></li>
+    <li style="padding-left:0.5rem;">
+      <a href="#music" class="listen-btn">&#9654; Listen</a>
+    </li>
+  </ul>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="home">
+  <div class="hero-slideshow" id="hero-slideshow">
+    <div class="hero-placeholder">
+      <div class="hero-placeholder-text">Talkhouse</div>
+    </div>
+  </div>
+  <div class="hero-overlay">
+    <a href="#music" class="listen-btn">&#9654; Listen Now</a>
+  </div>
+</section>
+
+<!-- ── MERCH ── -->
+<section id="merch">
+  <div class="section-header">
+    <h2 class="section-label">Merch</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="merch-filter">
+    <button class="filter-btn active" onclick="filterMerch('all')">All</button>
+    <button class="filter-btn" onclick="filterMerch('apparel')">Apparel</button>
+    <button class="filter-btn" onclick="filterMerch('music')">Music</button>
+    <button class="filter-btn" onclick="filterMerch('misc')">Misc</button>
+  </div>
+  <div class="merch-grid" id="merch-grid">
+    <!-- Populated by JS -->
+  </div>
+</section>
+
+<!-- ── MUSIC ── -->
+<section id="music">
+  <div class="music-inner">
+    <h2 class="music-section-label">Music</h2>
+    <div class="discography" id="discography">
+      <!-- Populated by JS -->
+    </div>
+    <div class="video-wrapper" id="video-wrapper">
+      <div class="video-placeholder" onclick="loadVideo()" style="cursor:pointer;">
+        <div class="play-icon"></div>
+        <span>Watch Latest Music Video</span>
+      </div>
+    </div>
+    <p class="video-caption" id="video-caption">Latest Music Video — coming soon</p>
+  </div>
+</section>
+
+<!-- ── SHOWS ── -->
+<section id="shows">
+  <div class="section-header" style="padding-left:0; padding-top:0;">
+    <h2 class="section-label">Shows</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="tour-inner">
+    <div class="tour-list" id="tour-list">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ── ABOUT ── -->
+<section id="about">
+  <div class="section-header">
+    <h2 class="section-label">About</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="about-inner" style="grid-template-columns: 1fr;">
+    <div class="about-text">
+      <h3 class="about-band-name" id="about-band-name">Talkhouse</h3>
+      <div class="about-bio" id="about-bio">
+        <!-- Populated by JS -->
+      </div>
+      <div class="social-links" id="social-links">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── NEWSLETTER ── -->
+<div class="newsletter">
+  <div class="newsletter-label">Stay in the loop</div>
+  <h3 class="newsletter-title">Be the first to know about new music, merch &amp; shows.</h3>
+  <div class="newsletter-form">
+    <input class="newsletter-input" type="email" placeholder="your@email.com" />
+    <button class="newsletter-submit">Subscribe</button>
+  </div>
+</div>
+
+<!-- ── MODAL ── -->
+<div id="coming-soon-modal" style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.75); align-items:center; justify-content:center;">
+  <div style="background:var(--ink); border:2px solid var(--accent); padding:3rem 2.5rem; text-align:center; max-width:360px; width:90%;">
+    <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif; font-size:2.5rem; color:var(--bg); letter-spacing:0.1em; margin-bottom:0.5rem;">Coming Soon</div>
+    <p style="color:var(--muted); font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:2rem;">Stay tuned — this link is on its way.</p>
+    <button onclick="closeComingSoon()" style="font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; background:var(--accent); color:#fff; border:none; padding:0.6rem 1.8rem; cursor:pointer;">Close</button>
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-copy">© 2026 Talkhouse</div>
+</footer>
+
+<script>
+  // ── DATA LOADING ──
+  // Fetches all JSON data files and renders the page dynamically.
+  // These files are managed via the Decap CMS at /admin.
+
+  let videoId = '';
+
+  async function fetchJSON(path) {
+    try {
+      const res = await fetch(path + '?v=' + Date.now());
+      if (!res.ok) return null;
+      return await res.json();
+    } catch(e) {
+      return null;
+    }
+  }
+
+  async function loadSite() {
+    const [bio, music, hero] = await Promise.all([
+      fetchJSON('/_data/bio.json'),
+      fetchJSON('/_data/music.json'),
+      fetchJSON('/_data/hero.json'),
+    ]);
+
+    if (bio) renderBio(bio);
+    if (music) renderMusic(music);
+    if (hero) renderHero(hero);
+
+    await loadShows();
+    await loadMerch();
+  }
+
+  // ── BIO ──
+  function renderBio(bio) {
+    document.getElementById('about-band-name').textContent = bio.band_name || 'Talkhouse';
+
+    const bioEl = document.getElementById('about-bio');
+    bioEl.innerHTML = (bio.paragraphs || []).map(p => `<p>${p}</p>`).join('');
+
+    const socialEl = document.getElementById('social-links');
+    const s = bio.social || {};
+    const links = [
+      { label: 'Instagram', url: s.instagram },
+      { label: 'Spotify', url: s.spotify },
+      { label: 'Bandcamp', url: s.bandcamp },
+      { label: 'Apple Music', url: s.apple_music },
+      { label: 'YouTube', url: s.youtube },
+      { label: 'Contact', url: s.email ? 'mailto:' + s.email : '' },
+    ];
+    socialEl.innerHTML = links.map(l => {
+      if (!l.url) return `<a href="#" class="social-link" onclick="showComingSoon(event)">${l.label}</a>`;
+      return `<a href="${l.url}" class="social-link" ${l.url.startsWith('mailto:') ? '' : 'target="_blank"'}>${l.label}</a>`;
+    }).join('');
+  }
+
+  // ── MUSIC ──
+  function renderMusic(music) {
+    videoId = music.video_id || '';
+
+    // Update video area
+    const wrapper = document.getElementById('video-wrapper');
+    const caption = document.getElementById('video-caption');
+    if (videoId) {
+      caption.textContent = 'Watch the latest music video';
+    } else {
+      caption.textContent = 'Latest Music Video — coming soon';
+    }
+
+    // Discography
+    const disc = document.getElementById('discography');
+    disc.innerHTML = (music.albums || []).map(album => {
+      const isOut = album.status === 'out';
+      const artInner = isOut && album.art
+        ? `<img src="${album.art}" alt="${album.title}" />`
+        : `<span class="coming-soon-badge">Coming Soon</span>`;
+      const card = `
+        <div class="album-card" ${isOut && album.link ? `onclick="window.open('${album.link}','_blank')"` : ''}>
+          <div class="album-art">${artInner}</div>
+          <div class="album-year">${album.year}</div>
+          <div class="album-title">${album.title}</div>
+          <div class="album-format">${album.format || ''}</div>
+        </div>`;
+      return card;
+    }).join('');
+  }
+
+  // ── HERO ──
+  function renderHero(hero) {
+    const slides = hero.slides || [];
+    if (!slides.length) return; // keep placeholder gradient
+
+    const slideshow = document.getElementById('hero-slideshow');
+    slideshow.innerHTML = slides.map((img, i) =>
+      `<div class="hero-slide${i === 0 ? ' active' : ''}" style="background-image:url('${img}');"></div>`
+    ).join('');
+
+    // Kickoff slideshow
+    const els = slideshow.querySelectorAll('.hero-slide');
+    let current = 0;
+    setInterval(() => {
+      els[current].classList.remove('active');
+      current = (current + 1) % els.length;
+      els[current].classList.add('active');
+    }, 20000);
+  }
+
+  // ── SHOWS ──
+  async function loadShows() {
+    // Fetch the shows index — Netlify serves directory listings as JSON if configured,
+    // so we use a shows-index.json that Decap maintains, or fall back to fetching known files.
+    // We use a manifest approach: fetch /_data/shows-manifest.json which lists all show files.
+    // If that doesn't exist, we gracefully show empty state.
+    const manifest = await fetchJSON('/_data/shows-manifest.json');
+    const list = document.getElementById('tour-list');
+
+    let shows = [];
+    if (manifest && Array.isArray(manifest)) {
+      const results = await Promise.all(manifest.map(f => fetchJSON('/_data/shows/' + f)));
+      shows = results.filter(Boolean).filter(s => s.status === 'live');
+    }
+
+    // Sort by date ascending
+    shows.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    if (!shows.length) {
+      list.innerHTML = '<p class="tour-empty">No upcoming dates. Check back soon.</p>';
+      return;
+    }
+
+    list.innerHTML = shows.map(s => {
+      const dateStr = new Date(s.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const ticketsHref = s.tickets_url || '#';
+      const ticketsAttr = s.tickets_url
+        ? `href="${s.tickets_url}" target="_blank"`
+        : `href="#" onclick="showComingSoon(event)"`;
+      return `
+        <div class="tour-row">
+          <div class="tour-date">${dateStr}</div>
+          <div>
+            <div class="tour-venue">${s.venue}</div>
+            <div class="tour-city">${s.city}</div>
+          </div>
+          <a ${ticketsAttr} class="tickets-btn">Tickets</a>
+        </div>`;
+    }).join('');
+  }
+
+  // ── MERCH ──
+  async function loadMerch() {
+    const manifest = await fetchJSON('/_data/merch-manifest.json');
+    const grid = document.getElementById('merch-grid');
+
+    let items = [];
+    if (manifest && Array.isArray(manifest)) {
+      const results = await Promise.all(manifest.map(f => fetchJSON('/_data/merch/' + f)));
+      items = results.filter(Boolean);
+    }
+
+    if (!items.length) {
+      grid.innerHTML = '<p style="padding:2rem; font-size:0.72rem; color:var(--muted);">No merch listed yet.</p>';
+      return;
+    }
+
+    grid.innerHTML = items.map(item => {
+      const imgEl = item.image
+        ? `<img class="merch-img" src="${item.image}" alt="${item.name}" />`
+        : `<div class="merch-img-placeholder">Photo Coming Soon</div>`;
+      const price = parseFloat(item.price).toFixed(2);
+      const cardClick = item.buy_link
+        ? `onclick="window.open('${item.buy_link}','_blank')"`
+        : `onclick="showComingSoon(event)"`;
+      return `
+        <div class="merch-card" data-cat="${item.category}" ${cardClick}>
+          ${imgEl}
+          <div class="merch-info">
+            <div class="merch-name">${item.name}</div>
+            <div class="merch-price">$${price}</div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── VIDEO ──
+  function loadVideo() {
+    if (!videoId) { showComingSoon({ preventDefault: () => {} }); return; }
+    const wrapper = document.getElementById('video-wrapper');
+    wrapper.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allowfullscreen allow="autoplay"></iframe>`;
+  }
+
+  // ── MERCH FILTER ──
+  function filterMerch(cat) {
+    document.querySelectorAll('.merch-card').forEach(c => {
+      c.classList.toggle('hidden', cat !== 'all' && c.dataset.cat !== cat);
+    });
+    document.querySelectorAll('.filter-btn').forEach(b => {
+      b.classList.toggle('active', b.textContent.trim().toLowerCase() === cat || (cat === 'all' && b.textContent.trim() === 'All'));
+    });
+  }
+
+  // ── MODAL ──
+  function showComingSoon(e) {
+    e.preventDefault();
+    document.getElementById('coming-soon-modal').style.display = 'flex';
+  }
+  function closeComingSoon() {
+    document.getElementById('coming-soon-modal').style.display = 'none';
+  }
+  document.getElementById('coming-soon-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeComingSoon();
+  });
+
+  // ── SMOOTH SCROLL ──
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    });
+  });
+
+  // ── NEWSLETTER ──
+  document.querySelector('.newsletter-submit').addEventListener('click', () => {
+    const input = document.querySelector('.newsletter-input');
+    const email = input.value;
+    if (email && email.includes('@')) {
+      fetch('https://script.google.com/macros/s/AKfycbz8IK5T1d40rh_FCtGLIzvHtG0TO8UmluBpkL6VwfXE4J1grXZeBijM26Uz-3W4UN4b/exec', {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'email=' + encodeURIComponent(email)
+      });
+      input.value = '';
+      input.placeholder = "You're on the list ✓";
+    } else {
+      input.placeholder = 'Please enter a valid email';
+    }
+  });
+
+  // ── Netlify Identity redirect ──
+  if (window.netlifyIdentity) {
+    window.netlifyIdentity.on('init', user => {
+      if (!user) {
+        window.netlifyIdentity.on('login', () => { document.location.href = '/admin/'; });
+      }
+    });
+  }
+
+  // ── BOOT ──
+  loadSite();
+</script>
+</body>
+</html>
