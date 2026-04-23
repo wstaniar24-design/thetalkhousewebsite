@@ -1,13 +1,6 @@
 {
   "shows": [
     {
-      "date": "Apr 10, 2026",
-      "venue": "The Sultan Room",
-      "city": "Brooklyn, NY",
-      "ticket_url": "",
-      "sold_out": false
-    },
-    {
       "sold_out": false,
       "date": "April 3, 2026",
       "venue": "Berlin Under",
