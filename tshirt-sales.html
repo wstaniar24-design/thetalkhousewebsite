@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Merch Table">
+<meta name="theme-color" content="#0a0a0a">
+<title>Merch Table</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0a0a; --surface:#141414; --surface2:#1c1c1c; --border:#272727;
+  --accent:#e8ff3a; --accent2:#ff4d6d; --text:#f0f0f0; --muted:#555;
+  --cash:#39d98a; --venmo:#008CFF; --warn:#ff9f3a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;min-height:100vh;}
+
+header{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:100;}
+.logo{font-family:"Bebas Neue",sans-serif;font-size:26px;letter-spacing:3px;color:var(--accent);}
+.hstats{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;}
+.hstat{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:6px 14px;text-align:center;min-width:76px;}
+.hstat .v{font-family:"DM Mono",monospace;font-size:18px;font-weight:500;line-height:1;}
+.hstat .l{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px;}
+.hstat.ca .v{color:var(--cash);} .hstat.vn .v{color:var(--venmo);} .hstat.to .v{color:var(--accent);}
+.hright{display:flex;align-items:center;gap:8px;}
+.live-badge{display:flex;align-items:center;gap:7px;font-family:"DM Mono",monospace;font-size:11px;color:var(--accent2);letter-spacing:2px;}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--accent2);animation:pulse 1.4s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.icon-btn{width:32px;height:32px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--muted);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.icon-btn:hover{border-color:#555;color:var(--text);}
+
+.main{display:grid;grid-template-columns:1fr 300px;min-height:calc(100vh - 61px);}
+.products{padding:20px;border-right:1px solid var(--border);overflow-y:auto;}
+.sec-label{font-family:"DM Mono",monospace;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:14px;}
+
+.shirt-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;margin-bottom:10px;overflow:hidden;}
+.shirt-top{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;gap:10px;}
+.shirt-left{display:flex;align-items:center;gap:12px;flex:1;min-width:0;}
+.shirt-icon{width:40px;height:40px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;cursor:pointer;}
+.shirt-icon:hover{border-color:#555;}
+.shirt-name{font-weight:700;font-size:15px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.shirt-price{font-family:"DM Mono",monospace;font-size:13px;color:var(--accent);}
+.shirt-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+
+.ring-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.ring-box{position:relative;width:48px;height:48px;}
+.ring-box svg{transform:rotate(-90deg);width:48px;height:48px;}
+.ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:"DM Mono",monospace;font-size:13px;font-weight:500;}
+.ring-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.sm-btn{width:28px;height:28px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--muted);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.sm-btn:hover{border-color:#555;color:var(--text);}
+.sm-btn.del:hover{border-color:var(--accent2);color:var(--accent2);}
+
+.sizes-row{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border-top:1px solid var(--border);}
+.size-cell{background:var(--surface2);display:flex;flex-direction:column;align-items:center;padding:10px 6px;gap:6px;position:relative;}
+.sz-lbl{font-family:"Bebas Neue",sans-serif;font-size:17px;letter-spacing:1px;color:var(--muted);line-height:1;}
+.sz-num{font-family:"DM Mono",monospace;font-size:26px;font-weight:500;line-height:1;}
+.sz-num.ok{color:var(--text);} .sz-num.warn{color:var(--warn);}
+.sz-num.low{color:var(--accent2);animation:blink 1.5s ease infinite;} .sz-num.empty{color:#2a2a2a;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
+.low-badge{position:absolute;top:5px;right:5px;background:var(--accent2);color:#fff;font-size:7px;font-weight:700;letter-spacing:1px;padding:1px 4px;border-radius:2px;text-transform:uppercase;}
+.sell-btn{width:100%;padding:10px 4px;background:var(--accent);border:none;border-radius:4px;color:#000;font-family:"Bebas Neue",sans-serif;font-size:20px;cursor:pointer;transition:all .1s;line-height:1;}
+.sell-btn:hover{background:#d4e832;} .sell-btn:active{transform:scale(.95);}
+.sell-btn:disabled{background:var(--surface);color:var(--border);cursor:not-allowed;transform:none;}
+.add1-btn{width:100%;padding:5px 4px;background:transparent;border:1px solid var(--border);border-radius:3px;color:var(--muted);font-size:11px;cursor:pointer;transition:all .15s;font-family:"DM Mono",monospace;}
+.add1-btn:hover{border-color:#555;color:var(--text);}
+.add-design-btn{width:100%;margin-top:6px;padding:13px;background:transparent;border:1px dashed var(--border);border-radius:5px;color:var(--muted);cursor:pointer;font-size:13px;transition:all .15s;}
+.add-design-btn:hover{border-color:#555;color:var(--text);}
+
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+.overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:28px;width:340px;transform:translateY(16px) scale(.97);transition:transform .25s cubic-bezier(.34,1.56,.64,1);}
+.overlay.open .modal{transform:translateY(0) scale(1);}
+.modal-lbl{font-family:"DM Mono",monospace;font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;}
+.modal-item{font-weight:700;font-size:18px;margin-bottom:16px;}
+.modal-price{font-family:"Bebas Neue",sans-serif;font-size:52px;color:var(--accent);line-height:1;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.pay-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.pay-btn{padding:18px 10px;border-radius:5px;border:2px solid transparent;cursor:pointer;font-family:"Bebas Neue",sans-serif;font-size:20px;letter-spacing:2px;transition:all .15s;line-height:1;}
+.pay-btn.cash{background:rgba(57,217,138,.08);border-color:var(--cash);color:var(--cash);}
+.pay-btn.cash:hover{background:rgba(57,217,138,.2);}
+.pay-btn.venmo{background:rgba(0,140,255,.08);border-color:var(--venmo);color:var(--venmo);}
+.pay-btn.venmo:hover{background:rgba(0,140,255,.2);}
+.cancel-btn{width:100%;padding:11px;background:transparent;border:1px solid var(--border);border-radius:5px;color:var(--muted);cursor:pointer;font-size:13px;transition:all .15s;}
+.cancel-btn:hover{color:var(--text);border-color:#555;}
+
+.venmo-modal{width:360px;background:#fff;border-radius:12px;overflow:hidden;padding:0;border:none;transform:translateY(16px) scale(.97);transition:transform .25s cubic-bezier(.34,1.56,.64,1);}
+.overlay.open .venmo-modal{transform:translateY(0) scale(1);}
+.v-header{background:var(--venmo);padding:20px 24px 16px;}
+.v-logo{font-family:"Bebas Neue",sans-serif;font-size:28px;letter-spacing:2px;color:#fff;}
+.v-sub{font-size:13px;color:rgba(255,255,255,.8);margin-top:2px;}
+.v-body{padding:20px 24px;display:flex;flex-direction:column;align-items:center;gap:12px;background:#fff;}
+.v-item{font-size:15px;font-weight:700;color:#1a1a1a;text-align:center;}
+.v-amt{font-family:"Bebas Neue",sans-serif;font-size:52px;color:var(--venmo);line-height:1;letter-spacing:2px;}
+.qr-box{background:#fff;border:3px solid var(--venmo);border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:center;width:228px;height:228px;position:relative;}
+.qr-box img{display:none;width:196px;height:196px;}
+.qr-msg{position:absolute;font-size:12px;color:#888;font-family:"DM Mono",monospace;text-align:center;padding:10px;}
+.v-user{font-size:14px;color:var(--venmo);font-family:"DM Mono",monospace;}
+.v-hint{font-size:11px;color:#999;text-align:center;}
+.v-warn{background:#fff8e1;border:1px solid #ffd54f;border-radius:6px;padding:10px 14px;font-size:12px;color:#7a5c00;text-align:center;width:100%;}
+.v-footer{padding:0 24px 20px;display:flex;flex-direction:column;gap:8px;background:#fff;}
+.v-confirm-btn{width:100%;padding:14px;background:var(--venmo);border:none;border-radius:6px;color:#fff;font-family:"Bebas Neue",sans-serif;font-size:18px;letter-spacing:2px;cursor:pointer;}
+.v-confirm-btn:hover{background:#0070cc;}
+.v-cancel-btn{width:100%;padding:11px;background:transparent;border:1px solid #ddd;border-radius:6px;color:#888;cursor:pointer;font-size:13px;}
+.v-cancel-btn:hover{color:#333;border-color:#aaa;}
+
+.edit-modal{width:380px;max-height:90vh;overflow-y:auto;}
+.field-grp{margin-bottom:16px;}
+.field-lbl{font-family:"DM Mono",monospace;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;display:block;}
+.field-in{width:100%;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:15px;outline:none;transition:border-color .15s;}
+.field-in:focus{border-color:var(--accent);}
+.price-in{font-family:"DM Mono",monospace;font-size:20px;color:var(--accent);}
+.stock-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.stock-cell{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.stock-lbl{font-family:"Bebas Neue",sans-serif;font-size:14px;color:var(--muted);}
+.stock-in{width:100%;padding:8px 4px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:"DM Mono",monospace;font-size:18px;text-align:center;outline:none;-moz-appearance:textfield;}
+.stock-in::-webkit-inner-spin-button,.stock-in::-webkit-outer-spin-button{-webkit-appearance:none;}
+.stock-in:focus{border-color:var(--accent);}
+.emoji-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.emoji-opt{width:36px;height:36px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.emoji-opt:hover{border-color:#555;}
+.emoji-opt.sel{border-color:var(--accent);background:rgba(232,255,58,.1);}
+.save-btn{width:100%;padding:14px;background:var(--accent);border:none;border-radius:5px;color:#000;font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:3px;cursor:pointer;margin-bottom:10px;}
+.save-btn:hover{background:#d4e832;}
+
+.settings-modal{width:360px;}
+.at-wrap{position:relative;}
+.at-sym{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--venmo);font-family:"DM Mono",monospace;font-size:15px;}
+.venmo-in{padding-left:26px;color:var(--venmo);font-family:"DM Mono",monospace;}
+
+.log-panel{display:flex;flex-direction:column;background:var(--surface);overflow:hidden;}
+.log-hdr{padding:16px 18px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.log-body{flex:1;overflow-y:auto;padding:8px 14px;}
+.log-entry{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);animation:slip .3s ease;}
+@keyframes slip{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
+.log-entry:last-child{border-bottom:none;}
+.log-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.log-dot.cash{background:var(--cash);} .log-dot.venmo{background:var(--venmo);}
+.log-txt{flex:1;min-width:0;}
+.log-shirt{font-size:13px;font-weight:600;}
+.log-meta{font-family:"DM Mono",monospace;font-size:10px;color:var(--muted);margin-top:1px;}
+.log-price{font-family:"DM Mono",monospace;font-size:13px;color:var(--accent);flex-shrink:0;}
+.undo-btn{background:none;border:none;color:#333;cursor:pointer;font-size:14px;padding:2px 4px;transition:color .15s;flex-shrink:0;}
+.undo-btn:hover{color:var(--accent2);}
+.log-empty{padding:40px 16px;text-align:center;color:var(--muted);font-size:13px;line-height:1.9;}
+.log-empty .big{font-size:28px;display:block;margin-bottom:10px;}
+.eod-btn{flex-shrink:0;margin:12px 14px;padding:13px;background:transparent;border:1px solid var(--border);border-radius:5px;color:var(--muted);cursor:pointer;font-family:"Bebas Neue",sans-serif;font-size:13px;letter-spacing:3px;transition:all .15s;}
+.eod-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+.sum-modal{width:420px;max-height:85vh;overflow-y:auto;}
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.sum-row:last-of-type{border-bottom:none;}
+.sk{color:var(--muted);font-family:"DM Mono",monospace;} .sv{font-weight:600;font-family:"DM Mono",monospace;}
+.sum-total{margin-top:16px;padding:16px;background:rgba(232,255,58,.05);border:1px solid var(--accent);border-radius:4px;display:flex;justify-content:space-between;align-items:center;}
+.sum-total .sk{font-family:"Bebas Neue",sans-serif;font-size:15px;letter-spacing:2px;color:var(--text);}
+.sum-total .sv{font-family:"Bebas Neue",sans-serif;font-size:30px;color:var(--accent);}
+.by-shirt{margin-top:20px;}
+.shirt-sum-row{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 12px;background:var(--surface2);border-radius:4px;margin-bottom:4px;font-size:13px;}
+.sz-pills{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;}
+.sz-pill{font-family:"DM Mono",monospace;font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:2px 6px;color:var(--muted);}
+.print-btn{width:100%;margin-top:16px;padding:14px;background:var(--accent);color:#000;border:none;border-radius:5px;font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:3px;cursor:pointer;}
+.print-btn:hover{background:#d4e832;}
+.night-lbl-in{width:100%;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:15px;outline:none;margin-top:10px;}
+.night-lbl-in:focus{border-color:var(--accent);}
+.close-night-btn{width:100%;margin-top:10px;padding:14px;background:transparent;border:2px solid var(--accent);border-radius:5px;color:var(--accent);font-family:"Bebas Neue",sans-serif;font-size:16px;letter-spacing:3px;cursor:pointer;transition:all .15s;}
+.close-night-btn:hover{background:var(--accent);color:#000;}
+
+.hist-modal{width:460px;max-height:85vh;overflow-y:auto;}
+.night-card{background:var(--surface2);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;overflow:hidden;}
+.night-hdr{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer;}
+.night-hdr:hover{background:rgba(255,255,255,.02);}
+.night-name{font-weight:700;font-size:15px;margin-bottom:2px;}
+.night-date{font-family:"DM Mono",monospace;font-size:11px;color:var(--muted);}
+.night-total{font-family:"Bebas Neue",sans-serif;font-size:22px;color:var(--accent);letter-spacing:1px;}
+.night-detail{display:none;padding:12px 16px;border-top:1px solid var(--border);}
+.night-detail.open{display:block;}
+.del-night-btn{background:none;border:none;color:#444;cursor:pointer;font-size:14px;padding:4px;transition:color .15s;margin-left:10px;}
+.del-night-btn:hover{color:var(--accent2);}
+.all-time{margin-top:16px;padding:16px;background:rgba(232,255,58,.05);border:1px solid var(--accent);border-radius:4px;}
+.all-time-title{font-family:"Bebas Neue",sans-serif;font-size:13px;letter-spacing:3px;color:var(--muted);margin-bottom:10px;}
+.no-nights{padding:40px 16px;text-align:center;color:var(--muted);font-size:13px;line-height:1.9;}
+.no-nights .big{font-size:28px;display:block;margin-bottom:10px;}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--accent);color:#000;font-weight:700;font-size:13px;padding:11px 22px;border-radius:30px;z-index:600;transition:transform .35s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+
+/* ── MOBILE / iPHONE / iPAD ─────────────────────────────────────────── */
+
+/* Prevent tap highlight and callout on iOS */
+* { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
+input, button { -webkit-appearance: none; }
+
+/* iPhone: single column, bottom log panel */
+@media(max-width:700px){
+  body { padding-bottom: env(safe-area-inset-bottom); }
+
+  header {
+    padding: 12px 16px;
+    padding-top: calc(12px + env(safe-area-inset-top));
+  }
+
+  .main { grid-template-columns: 1fr; height: auto; }
+
+  .products {
+    padding: 14px;
+    border-right: none;
+    padding-bottom: 0;
+  }
+
+  /* Bigger touch targets for sizes */
+  .sizes-row { grid-template-columns: repeat(5,1fr); }
+  .size-cell { padding: 10px 4px; gap: 5px; }
+  .sz-lbl { font-size: 14px; }
+  .sz-num { font-size: 22px; }
+  .sell-btn { padding: 12px 4px; font-size: 17px; border-radius: 6px; }
+  .add1-btn { padding: 6px 4px; font-size: 10px; }
+
+  /* Shirt card tighter */
+  .shirt-top { padding: 10px 12px 8px; }
+  .shirt-name { font-size: 14px; }
+  .shirt-card { margin-bottom: 8px; }
+
+  /* Collapsible log panel at bottom */
+  .log-panel {
+    max-height: 260px;
+    border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Header — hide stats, show just totals */
+  .hstats { display: none; }
+  .logo { font-size: 22px; }
+  .live-badge { font-size: 10px; letter-spacing: 1px; }
+  .icon-btn { width: 36px; height: 36px; font-size: 16px; }
+
+  /* Modals full-screen on iPhone */
+  .overlay { align-items: flex-end; }
+  .modal {
+    width: 100%;
+    border-radius: 16px 16px 0 0;
+    padding: 24px 20px;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+
+  /* Venmo modal full-width */
+  .venmo-modal {
+    width: 100%;
+    border-radius: 16px 16px 0 0;
+    max-height: 95vh;
+    overflow-y: auto;
+  }
+
+  /* Bigger pay buttons */
+  .pay-btn { padding: 20px 10px; font-size: 24px; }
+  .cancel-btn { padding: 14px; font-size: 15px; }
+  .save-btn { padding: 16px; font-size: 18px; }
+  .modal-price { font-size: 56px; }
+
+  /* Edit modal */
+  .edit-modal { width: 100%; }
+  .stock-grid { gap: 6px; }
+  .stock-in { font-size: 20px; padding: 10px 4px; }
+
+  /* Lock screen */
+  .lock-box { width: 90%; padding: 40px 24px; }
+  .lock-input { font-size: 22px; padding: 14px; }
+  .lock-btn { padding: 16px; font-size: 20px; }
+
+  /* Summary / history modals */
+  .sum-modal, .hist-modal { width: 100%; max-height: 88vh; }
+
+  /* EOD button bigger */
+  .eod-btn { padding: 16px; font-size: 14px; margin: 10px 12px; }
+  .add-design-btn { padding: 16px; font-size: 14px; margin-top: 8px; }
+}
+
+/* iPad: two-column but bigger everything */
+@media(min-width:701px) and (max-width:1100px){
+  .main { grid-template-columns: 1fr 280px; }
+  .sizes-row { grid-template-columns: repeat(5,1fr); }
+  .sell-btn { font-size: 18px; padding: 12px 4px; }
+  .sz-num { font-size: 24px; }
+  .modal { width: 420px; }
+}
+
+/* Prevent input zoom on iOS (needs font-size >= 16px) */
+input, select, textarea { font-size: 16px !important; }
+.stock-in { font-size: 18px !important; }
+.price-in { font-size: 20px !important; }
+
+
+/* LOCK SCREEN */
+.lock-screen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;}
+.lock-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:40px 32px;width:320px;text-align:center;}
+.lock-logo{font-family:"Bebas Neue",sans-serif;font-size:36px;letter-spacing:4px;color:var(--accent);margin-bottom:4px;}
+.lock-sub{font-size:12px;color:var(--muted);font-family:"DM Mono",monospace;letter-spacing:2px;margin-bottom:32px;}
+.lock-input{width:100%;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:"DM Mono",monospace;font-size:20px;text-align:center;letter-spacing:4px;outline:none;margin-bottom:12px;}
+.lock-input:focus{border-color:var(--accent);}
+.lock-btn{width:100%;padding:14px;background:var(--accent);border:none;border-radius:5px;color:#000;font-family:"Bebas Neue",sans-serif;font-size:18px;letter-spacing:3px;cursor:pointer;}
+.lock-btn:hover{background:#d4e832;}
+.lock-err{font-size:12px;color:var(--accent2);font-family:"DM Mono",monospace;margin-top:10px;min-height:16px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">&#127928; Merch</div>
+  <div class="hstats">
+    <div class="hstat ca"><div class="v" id="hCash">$0</div><div class="l">Cash</div></div>
+    <div class="hstat vn"><div class="v" id="hVenmo">$0</div><div class="l">Venmo</div></div>
+    <div class="hstat"><div class="v" id="hSold">0</div><div class="l">Sold</div></div>
+    <div class="hstat to"><div class="v" id="hTotal">$0</div><div class="l">Revenue</div></div>
+  </div>
+  <div class="hright">
+    <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+    <button class="icon-btn" id="histBtn" title="History">&#128196;</button>
+    <button class="icon-btn" id="settingsBtn" title="Settings">&#9881;&#65039;</button>
+  </div>
+</header>
+
+<div class="main">
+  <div class="products">
+    <div class="sec-label">Inventory &mdash; tap a size to sell</div>
+    <div id="shirtList"></div>
+    <button class="add-design-btn" id="addDesignBtn">+ Add New Design</button>
+  </div>
+  <div class="log-panel">
+    <div class="log-hdr"><div class="sec-label" style="margin-bottom:0">Sales Log</div></div>
+    <div class="log-body" id="logBody"></div>
+    <button class="eod-btn" id="eodBtn">End of Night Summary</button>
+  </div>
+</div>
+
+<!-- Pay Modal -->
+<div class="overlay" id="payOverlay">
+  <div class="modal">
+    <div class="modal-lbl">Confirm Sale</div>
+    <div class="modal-item" id="mItem"></div>
+    <div class="modal-price" id="mPrice">$0</div>
+    <div class="pay-row">
+      <button class="pay-btn cash" id="cashBtn">&#128181; Cash</button>
+      <button class="pay-btn venmo" id="venmoBtn">&#119325; Venmo</button>
+    </div>
+    <button class="cancel-btn" id="payCancelBtn">Cancel</button>
+  </div>
+</div>
+
+<!-- Venmo Modal -->
+<div class="overlay" id="venmoOverlay">
+  <div class="venmo-modal">
+    <div class="v-header">
+      <div class="v-logo">&#119325; Venmo</div>
+      <div class="v-sub">Scan to pay</div>
+    </div>
+    <div class="v-body">
+      <div id="vWarn" class="v-warn" style="display:none">&#9888; No Venmo username &mdash; add one in Settings &#9881;</div>
+      <div class="v-item" id="vItem"></div>
+      <div class="v-amt" id="vAmt">$0</div>
+      <div class="qr-box">
+        <img id="qrImg" alt="QR Code">
+        <div class="qr-msg" id="qrMsg">Generating QR&hellip;</div>
+      </div>
+      <div class="v-user" id="vUser"></div>
+      <div class="v-hint">Customer scans with phone camera</div>
+    </div>
+    <div class="v-footer">
+      <button class="v-confirm-btn" id="vConfirmBtn">&#10003; Payment Received</button>
+      <button class="v-cancel-btn" id="vCancelBtn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="overlay" id="editOverlay">
+  <div class="modal edit-modal">
+    <div class="modal-lbl" id="editHead">Edit Design</div>
+    <div class="field-grp">
+      <label class="field-lbl">Design Name</label>
+      <input class="field-in" id="eName" type="text" placeholder="e.g. Black Logo Tee" maxlength="40">
+    </div>
+    <div class="field-grp">
+      <label class="field-lbl">Price ($)</label>
+      <input class="field-in price-in" id="ePrice" type="number" min="1" max="999" placeholder="25">
+    </div>
+    <div class="field-grp">
+      <label class="field-lbl">Icon</label>
+      <div class="emoji-row" id="emojiRow"></div>
+    </div>
+    <div class="field-grp">
+      <label class="field-lbl">Stock per Size</label>
+      <div class="stock-grid" id="stockGrid"></div>
+    </div>
+    <button class="save-btn" id="saveEditBtn">Save Design</button>
+    <button class="cancel-btn" id="editCancelBtn">Cancel</button>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="overlay" id="settingsOverlay">
+  <div class="modal settings-modal">
+    <div class="modal-lbl">Settings</div>
+    <div style="font-weight:700;font-size:17px;margin-bottom:20px">Venmo Setup</div>
+    <div class="field-grp">
+      <label class="field-lbl">Your Venmo Username</label>
+      <div class="at-wrap">
+        <span class="at-sym">@</span>
+        <input class="field-in venmo-in" id="venmoIn" type="text" placeholder="your-username" maxlength="50">
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;font-family:'DM Mono',monospace">Enter without the @ symbol</div>
+    </div>
+    <button class="save-btn" id="saveSettingsBtn">Save</button>
+    <button class="cancel-btn" id="settingsCancelBtn">Cancel</button>
+  </div>
+</div>
+
+<!-- Summary Modal -->
+<div class="overlay" id="sumOverlay">
+  <div class="modal sum-modal">
+    <div class="modal-lbl">End of Night</div>
+    <div id="sumContent"></div>
+    <button class="print-btn" id="printBtn">&#128424; Print / Save</button>
+    <input class="night-lbl-in" id="nightName" placeholder="Name this night (e.g. Atlanta Night 1)" maxlength="60">
+    <button class="close-night-btn" id="closeNightBtn">&#10003; Save Night &amp; Reset</button>
+    <button class="cancel-btn" style="margin-top:8px" id="sumCancelBtn">Close Without Saving</button>
+  </div>
+</div>
+
+<!-- History Modal -->
+<div class="overlay" id="historyOverlay">
+  <div class="modal hist-modal">
+    <div class="modal-lbl">Show History</div>
+    <div style="font-weight:700;font-size:17px;margin-bottom:16px">All Nights</div>
+    <div id="histList"></div>
+    <button class="cancel-btn" style="margin-top:10px" id="histCancelBtn">Close</button>
+  </div>
+</div>
+
+
+<!-- Lock Screen -->
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-box">
+    <div class="lock-logo">&#127928; Merch</div>
+    <div class="lock-sub">Enter Password</div>
+    <input class="lock-input" id="lockInput" type="password" placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;" maxlength="30" autocomplete="off">
+    <button class="lock-btn" id="lockBtn">Unlock</button>
+    <div class="lock-err" id="lockErr"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var SIZES  = ['S','M','L','XL','XXL'];
+var CIRC   = 2 * Math.PI * 18;
+var EMOJIS = ['👕','⚡','🔥','🗺️','🎸','🎵','💀','⭐','🌙','🦅','🐺','💎','🏴','🎯','🌊','🦋'];
+
+var DEFAULTS = [
+  {id:1, name:'Classic Logo',    emoji:'⚡', price:25, stock:{S:5,M:10,L:8,XL:6,XXL:3}, initTotal:32},
+  {id:2, name:'Tour Dates',      emoji:'🗺️', price:30, stock:{S:4,M:6, L:6,XL:4,XXL:2}, initTotal:22},
+  {id:3, name:'Limited Edition', emoji:'🔥', price:40, stock:{S:2,M:3, L:2,XL:2,XXL:1}, initTotal:10}
+];
+
+function lsGet(k, fb) {
+  try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; }
+  catch(e) { return fb; }
+}
+function lsSet(k, v) {
+  try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {}
+}
+
+var shirts    = lsGet('m_shirts', JSON.parse(JSON.stringify(DEFAULTS)));
+var nights    = lsGet('m_nights', []);
+var venmoUser = lsGet('m_venmo',  '');
+var sales     = [];
+var pending   = null;
+var editingId = null;
+var editEmoji = EMOJIS[0];
+var nextId    = 100;
+if (shirts.length) nextId = Math.max.apply(null, shirts.map(function(s){return s.id;})) + 1;
+
+function ge(id) { return document.getElementById(id); }
+
+function showToast(msg) {
+  var t = ge('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+}
+
+function openOverlay(id)  { ge(id).classList.add('open');    }
+function closeOverlay(id) { ge(id).classList.remove('open'); }
+
+// ── RENDER ───────────────────────────────────────────────────────────────────
+function sumStock(shirt) {
+  return SIZES.reduce(function(a,sz){ return a + (shirt.stock[sz]||0); }, 0);
+}
+
+function sClass(n) {
+  if(n===0) return 'empty';
+  if(n===1) return 'low';
+  if(n<=3)  return 'warn';
+  return 'ok';
+}
+
+function rColor(r) {
+  if(r>0.5) return '#39d98a';
+  if(r>0.2) return '#ff9f3a';
+  return '#ff4d6d';
+}
+
+function render() {
+  var list = ge('shirtList');
+  if(!shirts.length) {
+    list.innerHTML = '<div style="color:var(--muted);text-align:center;padding:30px 0;font-size:13px">No designs yet — add one below!</div>';
+    updateHeader();
+    return;
+  }
+  var html = '';
+  for(var i=0; i<shirts.length; i++) {
+    var shirt = shirts[i];
+    var tot   = sumStock(shirt);
+    var ratio = shirt.initTotal > 0 ? Math.min(tot / shirt.initTotal, 1) : 0;
+    var offset = CIRC - ratio * CIRC;
+    var rc = rColor(ratio);
+    var ring = '<div class="ring-box">'
+      + '<svg viewBox="0 0 44 44">'
+      + '<circle fill="none" stroke="var(--border)" stroke-width="4" cx="22" cy="22" r="18"/>'
+      + '<circle fill="none" stroke="'+rc+'" stroke-width="4" stroke-linecap="round" cx="22" cy="22" r="18" '
+      + 'stroke-dasharray="'+CIRC.toFixed(1)+'" stroke-dashoffset="'+offset.toFixed(1)+'" transform="rotate(-90 22 22)"/>'
+      + '</svg>'
+      + '<div class="ring-num" style="color:'+rc+'">'+tot+'</div>'
+      + '</div><div class="ring-lbl">left</div>';
+
+    var sizeCells = '';
+    for(var j=0; j<SIZES.length; j++) {
+      var sz = SIZES[j];
+      var n  = shirt.stock[sz] || 0;
+      var sc = sClass(n);
+      sizeCells += '<div class="size-cell">'
+        + (sc==='low' ? '<div class="low-badge">Low</div>' : '')
+        + '<div class="sz-lbl">'+sz+'</div>'
+        + '<div class="sz-num '+sc+'">'+n+'</div>'
+        + '<button class="sell-btn" data-sid="'+shirt.id+'" data-sz="'+sz+'"'+(n===0?' disabled':'')+'>SELL</button>'
+        + '<button class="add1-btn" data-sid="'+shirt.id+'" data-sz="'+sz+'" data-act="add">+1</button>'
+        + '</div>';
+    }
+
+    html += '<div class="shirt-card">'
+      + '<div class="shirt-top">'
+        + '<div class="shirt-left">'
+          + '<div class="shirt-icon" data-sid="'+shirt.id+'" data-act="edit">'+shirt.emoji+'</div>'
+          + '<div><div class="shirt-name">'+shirt.name+'</div><div class="shirt-price">$'+shirt.price+'</div></div>'
+        + '</div>'
+        + '<div class="shirt-actions">'
+          + '<div class="ring-wrap">'+ring+'</div>'
+          + '<button class="sm-btn" data-sid="'+shirt.id+'" data-act="edit" title="Edit">&#9998;</button>'
+          + '<button class="sm-btn del" data-sid="'+shirt.id+'" data-act="del" title="Delete">&#10005;</button>'
+        + '</div>'
+      + '</div>'
+      + '<div class="sizes-row">'+sizeCells+'</div>'
+      + '</div>';
+  }
+  list.innerHTML = html;
+  updateHeader();
+}
+
+ge('shirtList').addEventListener('click', function(e) {
+  var sell = e.target.closest ? e.target.closest('.sell-btn') : null;
+  var add1 = e.target.closest ? e.target.closest('.add1-btn') : null;
+  var edit = e.target.closest ? e.target.closest('[data-act="edit"]') : null;
+  var del  = e.target.closest ? e.target.closest('[data-act="del"]')  : null;
+  if(sell && !sell.disabled) { initSale(+sell.dataset.sid, sell.dataset.sz); }
+  else if(add1) { doRestock(+add1.dataset.sid, add1.dataset.sz); }
+  else if(edit) { openEdit(+edit.dataset.sid); }
+  else if(del)  { doDelete(+del.dataset.sid);  }
+});
+
+function renderLog() {
+  var el = ge('logBody');
+  if(!sales.length) {
+    el.innerHTML = '<div class="log-empty"><span class="big">&#129534;</span>No sales yet.<br>Tap a size to start!</div>';
+    return;
+  }
+  var html = '';
+  for(var i=0; i<sales.length; i++) {
+    var s = sales[i];
+    html += '<div class="log-entry">'
+      + '<div class="log-dot '+s.method+'"></div>'
+      + '<div class="log-txt"><div class="log-shirt">'+s.name+' &middot; '+s.size+'</div>'
+      + '<div class="log-meta">'+s.time+' &middot; '+s.method+'</div></div>'
+      + '<div class="log-price">$'+s.price+'</div>'
+      + '<button class="undo-btn" data-id="'+s.id+'">&#8617;</button>'
+      + '</div>';
+  }
+  el.innerHTML = html;
+}
+
+ge('logBody').addEventListener('click', function(e) {
+  var btn = e.target.closest ? e.target.closest('.undo-btn') : null;
+  if(btn) undoSale(+btn.dataset.id);
+});
+
+function updateHeader() {
+  var cash=0, venmo=0;
+  for(var i=0;i<sales.length;i++){
+    if(sales[i].method==='cash')  cash  += sales[i].price;
+    if(sales[i].method==='venmo') venmo += sales[i].price;
+  }
+  ge('hCash').textContent  = '$'+cash;
+  ge('hVenmo').textContent = '$'+venmo;
+  ge('hSold').textContent  = sales.length;
+  ge('hTotal').textContent = '$'+(cash+venmo);
+}
+
+// ── SELL ─────────────────────────────────────────────────────────────────────
+function initSale(shirtId, size) {
+  var shirt = null;
+  for(var i=0;i<shirts.length;i++) if(shirts[i].id===shirtId){ shirt=shirts[i]; break; }
+  if(!shirt) return;
+  pending = {shirtId:shirtId, size:size, price:shirt.price, name:shirt.name};
+  ge('mItem').textContent  = shirt.name + ' — Size ' + size;
+  ge('mPrice').textContent = '$' + shirt.price;
+  openOverlay('payOverlay');
+}
+
+function confirmSale(method) {
+  if(!pending) return;
+  var shirt = null;
+  for(var i=0;i<shirts.length;i++) if(shirts[i].id===pending.shirtId){ shirt=shirts[i]; break; }
+  if(!shirt) { pending=null; return; }
+  shirt.stock[pending.size] = (shirt.stock[pending.size]||0) - 1;
+  lsSet('m_shirts', shirts);
+  var entry = {
+    id:   Date.now(),
+    shirtId: pending.shirtId,
+    size:  pending.size,
+    price: pending.price,
+    name:  pending.name,
+    method:method,
+    time:  new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})
+  };
+  sales.unshift(entry);
+  pending = null;
+  render();
+  renderLog();
+  showToast(entry.name + ' · ' + entry.size + ' · $' + entry.price);
+}
+
+ge('cashBtn').onclick = function() {
+  confirmSale('cash');
+  closeOverlay('payOverlay');
+};
+
+ge('payCancelBtn').onclick = function() {
+  pending = null;
+  closeOverlay('payOverlay');
+};
+
+// ── VENMO ────────────────────────────────────────────────────────────────────
+ge('venmoBtn').onclick = function() {
+  if(!pending) return;
+  var name  = pending.name;
+  var size  = pending.size;
+  var price = pending.price;
+  // close pay without clearing pending
+  ge('payOverlay').classList.remove('open');
+
+  var user = (venmoUser||'').trim();
+  ge('vItem').textContent = name + ' — Size ' + size;
+  ge('vAmt').textContent  = '$' + price;
+  ge('vUser').textContent = user ? '@'+user : '';
+  ge('vWarn').style.display = user ? 'none' : 'block';
+
+  var img = ge('qrImg');
+  var msg = ge('qrMsg');
+  img.style.display = 'none';
+  msg.style.display = 'block';
+  msg.textContent   = 'Generating QR…';
+
+  var venmoUrl = user
+    ? 'https://venmo.com/' + encodeURIComponent(user) + '?txn=pay&amount=' + price + '&note=' + encodeURIComponent(name+' '+size)
+    : 'https://venmo.com/';
+  var src = 'https://api.qrserver.com/v1/create-qr-code/?size=196x196&data=' + encodeURIComponent(venmoUrl) + '&color=003087&bgcolor=ffffff&margin=0';
+
+  img.onload  = function(){ msg.style.display='none'; img.style.display='block'; };
+  img.onerror = function(){ msg.textContent='Could not load QR — check your internet.'; };
+  img.src = src;
+
+  openOverlay('venmoOverlay');
+};
+
+ge('vConfirmBtn').onclick = function() {
+  closeOverlay('venmoOverlay');
+  confirmSale('venmo');
+};
+
+ge('vCancelBtn').onclick = function() {
+  pending = null;
+  closeOverlay('venmoOverlay');
+};
+
+// ── RESTOCK / DELETE ─────────────────────────────────────────────────────────
+function doRestock(shirtId, size) {
+  for(var i=0;i<shirts.length;i++) {
+    if(shirts[i].id===shirtId) {
+      shirts[i].stock[size] = (shirts[i].stock[size]||0) + 1;
+      shirts[i].initTotal   = Math.max(shirts[i].initTotal||0, sumStock(shirts[i]));
+      lsSet('m_shirts', shirts);
+      render();
+      return;
+    }
+  }
+}
+
+function doDelete(shirtId) {
+  if(!confirm('Remove this design?')) return;
+  shirts = shirts.filter(function(s){ return s.id !== shirtId; });
+  lsSet('m_shirts', shirts);
+  render();
+}
+
+// ── EDIT ─────────────────────────────────────────────────────────────────────
+function openEdit(id) {
+  editingId = id || null;
+  var shirt = null;
+  if(id) for(var i=0;i<shirts.length;i++) if(shirts[i].id===id){ shirt=shirts[i]; break; }
+
+  ge('editHead').textContent = shirt ? 'Edit Design' : 'New Design';
+  ge('eName').value   = shirt ? shirt.name  : '';
+  ge('ePrice').value  = shirt ? shirt.price : '';
+  editEmoji = shirt ? shirt.emoji : EMOJIS[0];
+
+  var eRow = '';
+  for(var j=0;j<EMOJIS.length;j++) {
+    eRow += '<div class="emoji-opt'+(EMOJIS[j]===editEmoji?' sel':'')+'" data-e="'+j+'">'+EMOJIS[j]+'</div>';
+  }
+  ge('emojiRow').innerHTML = eRow;
+
+  var sg = '';
+  for(var k=0;k<SIZES.length;k++) {
+    var sz = SIZES[k];
+    var val = shirt ? (shirt.stock[sz]||0) : 5;
+    sg += '<div class="stock-cell"><div class="stock-lbl">'+sz+'</div>'
+        + '<input class="stock-in" id="si_'+sz+'" type="number" min="0" max="999" value="'+val+'"></div>';
+  }
+  ge('stockGrid').innerHTML = sg;
+
+  openOverlay('editOverlay');
+  setTimeout(function(){ ge('eName').focus(); }, 300);
+}
+
+ge('emojiRow').addEventListener('click', function(e) {
+  var opt = e.target.closest ? e.target.closest('.emoji-opt') : null;
+  if(!opt) return;
+  editEmoji = EMOJIS[+opt.dataset.e];
+  var all = document.querySelectorAll('.emoji-opt');
+  for(var i=0;i<all.length;i++) all[i].classList.toggle('sel', all[i].dataset.e === opt.dataset.e);
+});
+
+ge('saveEditBtn').onclick = function() {
+  var name  = ge('eName').value.trim();
+  var price = parseInt(ge('ePrice').value, 10);
+  if(!name)  { ge('eName').focus();  showToast('Please enter a name');  return; }
+  if(!price) { ge('ePrice').focus(); showToast('Please enter a price'); return; }
+  var stock = {};
+  for(var i=0;i<SIZES.length;i++) {
+    stock[SIZES[i]] = Math.max(0, parseInt(ge('si_'+SIZES[i]).value, 10) || 0);
+  }
+  var total = SIZES.reduce(function(a,sz){ return a+stock[sz]; }, 0);
+
+  if(editingId) {
+    for(var j=0;j<shirts.length;j++) {
+      if(shirts[j].id===editingId) {
+        shirts[j].name      = name;
+        shirts[j].price     = price;
+        shirts[j].emoji     = editEmoji;
+        shirts[j].stock     = stock;
+        shirts[j].initTotal = Math.max(shirts[j].initTotal||0, total);
+        break;
+      }
+    }
+    showToast(name + ' updated');
+  } else {
+    shirts.push({id:nextId++, name:name, emoji:editEmoji, price:price, stock:stock, initTotal:total});
+    showToast(name + ' added');
+  }
+  lsSet('m_shirts', shirts);
+  closeOverlay('editOverlay');
+  render();
+};
+
+ge('editCancelBtn').onclick = function() { closeOverlay('editOverlay'); };
+ge('addDesignBtn').onclick  = function() { openEdit(null); };
+
+// ── SETTINGS ─────────────────────────────────────────────────────────────────
+ge('settingsBtn').onclick = function() {
+  ge('venmoIn').value = venmoUser || '';
+  openOverlay('settingsOverlay');
+  setTimeout(function(){ ge('venmoIn').focus(); }, 300);
+};
+
+ge('saveSettingsBtn').onclick = function() {
+  venmoUser = ge('venmoIn').value.trim().replace(/^@/, '');
+  lsSet('m_venmo', venmoUser);
+  closeOverlay('settingsOverlay');
+  showToast(venmoUser ? 'Venmo set to @'+venmoUser : 'Venmo username cleared');
+};
+
+ge('settingsCancelBtn').onclick = function() { closeOverlay('settingsOverlay'); };
+
+// ── SUMMARY ───────────────────────────────────────────────────────────────────
+ge('eodBtn').onclick = function() {
+  var cash=0, venmo=0;
+  for(var i=0;i<sales.length;i++){
+    if(sales[i].method==='cash')  cash  += sales[i].price;
+    if(sales[i].method==='venmo') venmo += sales[i].price;
+  }
+  var byShirt = {};
+  for(var i=0;i<shirts.length;i++) byShirt[shirts[i].id]={name:shirts[i].name,sold:0,revenue:0,sizes:{}};
+  for(var i=0;i<sales.length;i++) {
+    var s = sales[i];
+    if(!byShirt[s.shirtId]) continue;
+    byShirt[s.shirtId].sold++;
+    byShirt[s.shirtId].revenue += s.price;
+    byShirt[s.shirtId].sizes[s.size] = (byShirt[s.shirtId].sizes[s.size]||0)+1;
+  }
+  var rows = '';
+  var entries = Object.values ? Object.values(byShirt) : Object.keys(byShirt).map(function(k){return byShirt[k];});
+  for(var i=0;i<entries.length;i++) {
+    var d = entries[i];
+    if(!d.sold) continue;
+    var pills = '';
+    for(var j=0;j<SIZES.length;j++) {
+      if(d.sizes[SIZES[j]]) pills += '<span class="sz-pill">'+SIZES[j]+': '+d.sizes[SIZES[j]]+'</span>';
+    }
+    rows += '<div class="shirt-sum-row"><div><div style="font-weight:700">'+d.name+'</div>'
+      +'<div class="sz-pills">'+pills+'</div></div>'
+      +'<div style="text-align:right"><div style="font-family:\'DM Mono\',monospace;font-weight:700">$'+d.revenue+'</div>'
+      +'<div style="font-size:11px;color:var(--muted);font-family:\'DM Mono\',monospace">'+d.sold+' sold</div></div></div>';
+  }
+  if(!rows) rows = '<div style="color:var(--muted);font-size:13px;padding:8px 0">No sales recorded</div>';
+
+  var remaining = 0;
+  for(var i=0;i<shirts.length;i++) remaining += sumStock(shirts[i]);
+
+  ge('sumContent').innerHTML =
+    '<div class="sum-row"><span class="sk">Total Sales</span><span class="sv">'+sales.length+'</span></div>'
+    +'<div class="sum-row"><span class="sk">Cash</span><span class="sv" style="color:var(--cash)">$'+cash+'</span></div>'
+    +'<div class="sum-row"><span class="sk">Venmo</span><span class="sv" style="color:var(--venmo)">$'+venmo+'</span></div>'
+    +'<div class="sum-row"><span class="sk">Remaining Stock</span><span class="sv">'+remaining+'</span></div>'
+    +'<div class="sum-total"><span class="sk">Total Revenue</span><span class="sv">$'+(cash+venmo)+'</span></div>'
+    +'<div class="by-shirt"><div class="sec-label" style="margin-top:16px;margin-bottom:8px">By Design</div>'+rows+'</div>';
+
+  ge('nightName').value = '';
+  openOverlay('sumOverlay');
+};
+
+ge('printBtn').onclick    = function() { window.print(); };
+ge('sumCancelBtn').onclick = function() { closeOverlay('sumOverlay'); };
+
+ge('closeNightBtn').onclick = function() {
+  if(!sales.length) { showToast('No sales to save!'); return; }
+  var label = ge('nightName').value.trim() ||
+    new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+  var cash=0, venmo=0;
+  for(var i=0;i<sales.length;i++){
+    if(sales[i].method==='cash')  cash  += sales[i].price;
+    if(sales[i].method==='venmo') venmo += sales[i].price;
+  }
+  var byShirt = {};
+  for(var i=0;i<shirts.length;i++) byShirt[shirts[i].id]={name:shirts[i].name,sold:0,revenue:0,sizes:{}};
+  for(var i=0;i<sales.length;i++) {
+    var s=sales[i];
+    if(!byShirt[s.shirtId]) continue;
+    byShirt[s.shirtId].sold++;
+    byShirt[s.shirtId].revenue+=s.price;
+    byShirt[s.shirtId].sizes[s.size]=(byShirt[s.shirtId].sizes[s.size]||0)+1;
+  }
+  var byShirtArr = Object.values ? Object.values(byShirt) : Object.keys(byShirt).map(function(k){return byShirt[k];});
+  var saved = byShirtArr.filter(function(d){return d.sold>0;});
+  nights.unshift({
+    id:    Date.now(),
+    label: label,
+    date:  new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}),
+    cash:  cash,
+    venmo: venmo,
+    total: cash+venmo,
+    count: sales.length,
+    byShirt: saved
+  });
+  lsSet('m_nights', nights);
+  sales = [];
+  closeOverlay('sumOverlay');
+  render();
+  renderLog();
+  showToast(label + ' saved! Ready for next show.');
+};
+
+// ── HISTORY ───────────────────────────────────────────────────────────────────
+ge('histBtn').onclick = function() { openHistory(); };
+
+function openHistory() {
+  var el = ge('histList');
+  if(!nights.length) {
+    el.innerHTML = '<div class="no-nights"><span class="big">&#128197;</span>No nights saved yet.<br>Close out a night to see it here.</div>';
+  } else {
+    var html = '';
+    for(var i=0;i<nights.length;i++) {
+      var n = nights[i];
+      var rows = '';
+      if(n.byShirt) {
+        for(var j=0;j<n.byShirt.length;j++) {
+          var d = n.byShirt[j];
+          var pills='';
+          for(var k=0;k<SIZES.length;k++) {
+            if(d.sizes && d.sizes[SIZES[k]]) pills+='<span class="sz-pill">'+SIZES[k]+': '+d.sizes[SIZES[k]]+'</span>';
+          }
+          rows+='<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">'
+            +'<div><div style="font-weight:600">'+d.name+'</div><div class="sz-pills">'+pills+'</div></div>'
+            +'<div style="text-align:right;font-family:\'DM Mono\',monospace;font-weight:700">$'+d.revenue
+            +'<br><span style="color:var(--muted);font-weight:400">'+d.sold+' sold</span></div></div>';
+        }
+      }
+      html += '<div class="night-card">'
+        +'<div class="night-hdr" data-idx="'+i+'">'
+          +'<div><div class="night-name">'+n.label+'</div><div class="night-date">'+n.date+' &middot; '+n.count+' sales</div></div>'
+          +'<div style="display:flex;align-items:center">'
+            +'<div class="night-total">$'+n.total+'</div>'
+            +'<button class="del-night-btn" data-idx="'+i+'">&#10005;</button>'
+          +'</div>'
+        +'</div>'
+        +'<div class="night-detail" id="nd_'+i+'">'
+          +'<div class="sum-row"><span class="sk">Cash</span><span class="sv" style="color:var(--cash)">$'+n.cash+'</span></div>'
+          +'<div class="sum-row"><span class="sk">Venmo</span><span class="sv" style="color:var(--venmo)">$'+n.venmo+'</span></div>'
+          +(rows ? '<div style="margin-top:8px">'+rows+'</div>' : '')
+        +'</div>'
+        +'</div>';
+    }
+    var gt=0,gc=0,gv=0,gs=0;
+    for(var i=0;i<nights.length;i++){gt+=nights[i].total;gc+=nights[i].cash;gv+=nights[i].venmo;gs+=nights[i].count;}
+    html += '<div class="all-time"><div class="all-time-title">All-Time Totals</div>'
+      +'<div class="sum-row"><span class="sk">Nights</span><span class="sv">'+nights.length+'</span></div>'
+      +'<div class="sum-row"><span class="sk">Units Sold</span><span class="sv">'+gs+'</span></div>'
+      +'<div class="sum-row"><span class="sk">Cash</span><span class="sv" style="color:var(--cash)">$'+gc+'</span></div>'
+      +'<div class="sum-row"><span class="sk">Venmo</span><span class="sv" style="color:var(--venmo)">$'+gv+'</span></div>'
+      +'<div class="sum-row"><span class="sk">Total Revenue</span><span class="sv" style="color:var(--accent);font-size:16px">$'+gt+'</span></div>'
+      +'</div>';
+    el.innerHTML = html;
+  }
+  openOverlay('historyOverlay');
+}
+
+ge('histList').addEventListener('click', function(e) {
+  var del = e.target.closest ? e.target.closest('.del-night-btn') : null;
+  var hdr = e.target.closest ? e.target.closest('.night-hdr')     : null;
+  if(del) {
+    e.stopPropagation();
+    if(!confirm('Delete this night? Cannot be undone.')) return;
+    nights.splice(+del.dataset.idx, 1);
+    lsSet('m_nights', nights);
+    openHistory();
+  } else if(hdr) {
+    var d = ge('nd_'+hdr.dataset.idx);
+    if(d) d.classList.toggle('open');
+  }
+});
+
+ge('histCancelBtn').onclick = function() { closeOverlay('historyOverlay'); };
+
+// ── UNDO ─────────────────────────────────────────────────────────────────────
+function undoSale(id) {
+  var idx = -1;
+  for(var i=0;i<sales.length;i++) if(sales[i].id===id){ idx=i; break; }
+  if(idx===-1) return;
+  var sale = sales[idx];
+  for(var i=0;i<shirts.length;i++) {
+    if(shirts[i].id===sale.shirtId) {
+      shirts[i].stock[sale.size] = (shirts[i].stock[sale.size]||0)+1;
+      lsSet('m_shirts', shirts);
+      break;
+    }
+  }
+  sales.splice(idx,1);
+  render();
+  renderLog();
+  showToast('Sale undone');
+}
+
+// ── BACKDROP / ESC ────────────────────────────────────────────────────────────
+var overlays = ['payOverlay','venmoOverlay','editOverlay','settingsOverlay','sumOverlay','historyOverlay'];
+for(var oi=0;oi<overlays.length;oi++) {
+  (function(id){
+    ge(id).addEventListener('click', function(e){ if(e.target===this) closeOverlay(id); });
+  })(overlays[oi]);
+}
+document.addEventListener('keydown', function(e) {
+  if(e.key==='Escape') for(var i=0;i<overlays.length;i++) closeOverlay(overlays[i]);
+});
+
+
+// ── LOCK SCREEN ──────────────────────────────────────────────────────────────
+(function(){
+  var PW = 'Merch69';
+  var unlocked = sessionStorage.getItem('merch_unlocked') === '1';
+  if(unlocked) { ge('lockScreen').style.display='none'; return; }
+
+  function tryUnlock(){
+    var val = ge('lockInput').value;
+    if(val === PW){
+      sessionStorage.setItem('merch_unlocked','1');
+      ge('lockScreen').style.display='none';
+      ge('lockErr').textContent='';
+    } else {
+      ge('lockErr').textContent='Incorrect password';
+      ge('lockInput').value='';
+      ge('lockInput').focus();
+    }
+  }
+
+  ge('lockBtn').onclick = tryUnlock;
+  ge('lockInput').addEventListener('keydown', function(e){
+    if(e.key==='Enter') tryUnlock();
+  });
+  setTimeout(function(){ ge('lockInput').focus(); }, 100);
+})();
+// ── END LOCK SCREEN ──────────────────────────────────────────────────────────
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+render();
+renderLog();
+</script>
+</body>
+</html>
