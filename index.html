@@ -357,81 +357,71 @@
   }
 
   // ── SHOWS ──
-  async function loadShows() {
-    // Fetch the shows index — Netlify serves directory listings as JSON if configured,
-    // so we use a shows-index.json that Decap maintains, or fall back to fetching known files.
-    // We use a manifest approach: fetch /_data/shows-manifest.json which lists all show files.
-    // If that doesn't exist, we gracefully show empty state.
-    const manifest = await fetchJSON('/_data/shows-manifest.json');
-    const list = document.getElementById('tour-list');
+ async function loadShows() {
+  const data = await fetchJSON('/_data/shows.json');
+  const list = document.getElementById('tour-list');
 
-    let shows = [];
-    if (manifest && Array.isArray(manifest)) {
-      const results = await Promise.all(manifest.map(f => fetchJSON('/_data/shows/' + f)));
-      shows = results.filter(Boolean).filter(s => s.status === 'live');
-    }
-
-    // Sort by date ascending
-    shows.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-    if (!shows.length) {
-      list.innerHTML = '<p class="tour-empty">No upcoming dates. Check back soon.</p>';
-      return;
-    }
-
-    list.innerHTML = shows.map(s => {
-      const dateStr = new Date(s.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-      const ticketsHref = s.tickets_url || '#';
-      const ticketsAttr = s.tickets_url
-        ? `href="${s.tickets_url}" target="_blank"`
-        : `href="#" onclick="showComingSoon(event)"`;
-      return `
-        <div class="tour-row">
-          <div class="tour-date">${dateStr}</div>
-          <div>
-            <div class="tour-venue">${s.venue}</div>
-            <div class="tour-city">${s.city}</div>
-          </div>
-          <a ${ticketsAttr} class="tickets-btn">Tickets</a>
-        </div>`;
-    }).join('');
+  let shows = [];
+  if (data && Array.isArray(data.shows)) {
+    shows = data.shows.filter(s => s.status === 'live');
   }
 
-  // ── MERCH ──
-  async function loadMerch() {
-    const manifest = await fetchJSON('/_data/merch-manifest.json');
-    const grid = document.getElementById('merch-grid');
+  shows.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    let items = [];
-    if (manifest && Array.isArray(manifest)) {
-      const results = await Promise.all(manifest.map(f => fetchJSON('/_data/merch/' + f)));
-      items = results.filter(Boolean);
-    }
-
-    if (!items.length) {
-      grid.innerHTML = '<p style="padding:2rem; font-size:0.72rem; color:var(--muted);">No merch listed yet.</p>';
-      return;
-    }
-
-    grid.innerHTML = items.map(item => {
-      const imgEl = item.image
-        ? `<img class="merch-img" src="${item.image}" alt="${item.name}" />`
-        : `<div class="merch-img-placeholder">Photo Coming Soon</div>`;
-      const price = parseFloat(item.price).toFixed(2);
-      const cardClick = item.buy_link
-        ? `onclick="window.open('${item.buy_link}','_blank')"`
-        : `onclick="showComingSoon(event)"`;
-      return `
-        <div class="merch-card" data-cat="${item.category}" ${cardClick}>
-          ${imgEl}
-          <div class="merch-info">
-            <div class="merch-name">${item.name}</div>
-            <div class="merch-price">$${price}</div>
-          </div>
-        </div>`;
-    }).join('');
+  if (!shows.length) {
+    list.innerHTML = '<p class="tour-empty">No upcoming dates. Check back soon.</p>';
+    return;
   }
 
+  list.innerHTML = shows.map(s => {
+    const dateStr = new Date(s.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const ticketsAttr = s.tickets_url
+      ? `href="${s.tickets_url}" target="_blank"`
+      : `href="#" onclick="showComingSoon(event)"`;
+    return `
+      <div class="tour-row">
+        <div class="tour-date">${dateStr}</div>
+        <div>
+          <div class="tour-venue">${s.venue}</div>
+          <div class="tour-city">${s.city}</div>
+        </div>
+        <a ${ticketsAttr} class="tickets-btn">Tickets</a>
+      </div>`;
+  }).join('');
+}
+
+async function loadMerch() {
+  const data = await fetchJSON('/_data/merch.json');
+  const grid = document.getElementById('merch-grid');
+
+  let items = [];
+  if (data && Array.isArray(data.items)) {
+    items = data.items;
+  }
+
+  if (!items.length) {
+    grid.innerHTML = '<p style="padding:2rem; font-size:0.72rem; color:var(--muted);">No merch listed yet.</p>';
+    return;
+  }
+
+  grid.innerHTML = items.map(item => {
+    const imgEl = item.image
+      ? `<img class="merch-img" src="${item.image}" alt="${item.name}" />`
+      : `<div class="merch-img-placeholder">Photo Coming Soon</div>`;
+    const price = parseFloat(item.price).toFixed(2);
+    const cardClick = item.buy_link
+      ? `onclick="window.open('${item.buy_link}','_blank')"`
+      : `onclick="showComingSoon(event)"`;
+    return `
+      <div class="merch-card" data-cat="${item.category}" ${cardClick}>
+        ${imgEl}
+        <div class="merch-info">
+          <div class="merch-name">${item.name}</div>
+          <div class="merch-price">$${price}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
   // ── VIDEO ──
   function loadVideo() {
     if (!videoId) { showComingSoon({ preventDefault: () => {} }); return; }
