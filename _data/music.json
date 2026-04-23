@@ -4,9 +4,9 @@
       "title": "Downtown",
       "year": "2026",
       "format": "CD / Cassette / Digital",
-      "art_url": "",
-      "buy_url": "",
-      "coming_soon": true
+      "art_url": "/images/uploads/talkhousesticker-album-art.jpg",
+      "buy_url": "https://orcd.co/downtown-talkhouse",
+      "coming_soon": false
     }
   ],
   "video": {
