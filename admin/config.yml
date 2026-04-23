@@ -1,0 +1,125 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  # ── HERO SLIDESHOW ──────────────────────────────────────────────
+  - name: "hero"
+    label: "Hero Slideshow"
+    files:
+      - name: "hero"
+        label: "Hero Settings"
+        file: "_data/hero.json"
+        format: json
+        fields:
+          - label: "Slides"
+            name: "slides"
+            widget: "list"
+            summary: "{{fields.alt}}"
+            fields:
+              - { label: "Photo", name: "image_url", widget: "image", required: false }
+              - { label: "Alt Text", name: "alt", widget: "string", hint: "Describe the photo for accessibility" }
+          - { label: "Tagline (below band name)", name: "tagline", widget: "string", required: false }
+          - { label: "CTA Button Label", name: "cta_label", widget: "string", default: "Listen Now" }
+          - { label: "CTA Button URL", name: "cta_url", widget: "string", required: false }
+
+  # ── BIO ─────────────────────────────────────────────────────────
+  - name: "bio"
+    label: "Bio & Social Links"
+    files:
+      - name: "bio"
+        label: "Bio & Social Links"
+        file: "_data/bio.json"
+        format: json
+        fields:
+          - { label: "Band Name", name: "band_name", widget: "string" }
+          - label: "Bio Paragraphs"
+            name: "bio"
+            widget: "list"
+            fields:
+              - { label: "Paragraph", name: "value", widget: "text" }
+          - label: "Social Links"
+            name: "social_links"
+            widget: "list"
+            summary: "{{fields.label}}"
+            fields:
+              - { label: "Platform Name", name: "label", widget: "string" }
+              - { label: "URL", name: "url", widget: "string", required: false, hint: "Use mailto: prefix for email addresses. Leave blank for 'coming soon'." }
+              - { label: "Active (has a real URL)", name: "active", widget: "boolean", default: false }
+
+  # ── SHOWS ────────────────────────────────────────────────────────
+  - name: "shows"
+    label: "Shows"
+    files:
+      - name: "shows"
+        label: "Upcoming Shows"
+        file: "_data/shows.json"
+        format: json
+        fields:
+          - label: "Shows"
+            name: "shows"
+            widget: "list"
+            summary: "{{fields.date}} — {{fields.venue}}, {{fields.city}}"
+            fields:
+              - { label: "Date", name: "date", widget: "string", hint: "e.g. Apr 10, 2026" }
+              - { label: "Venue", name: "venue", widget: "string" }
+              - { label: "City", name: "city", widget: "string", hint: "e.g. Brooklyn, NY" }
+              - { label: "Ticket URL", name: "ticket_url", widget: "string", required: false, hint: "Leave blank to show 'Coming Soon' modal" }
+              - { label: "Sold Out", name: "sold_out", widget: "boolean", default: false }
+
+  # ── MERCH ────────────────────────────────────────────────────────
+  - name: "merch"
+    label: "Merch"
+    files:
+      - name: "merch"
+        label: "Merch Items"
+        file: "_data/merch.json"
+        format: json
+        fields:
+          - label: "Items"
+            name: "items"
+            widget: "list"
+            summary: "{{fields.name}} — ${{fields.price}}"
+            fields:
+              - { label: "Name", name: "name", widget: "string" }
+              - { label: "Price", name: "price", widget: "string", hint: "Numbers only, e.g. 20.00" }
+              - label: "Category"
+                name: "category"
+                widget: "select"
+                options:
+                  - { label: "Apparel", value: "apparel" }
+                  - { label: "Music", value: "music" }
+                  - { label: "Misc", value: "misc" }
+              - { label: "Product Photo", name: "image_url", widget: "image", required: false }
+              - { label: "Buy Link", name: "buy_url", widget: "string", required: false, hint: "Leave blank to show 'Coming Soon' modal" }
+              - { label: "Sold Out", name: "sold_out", widget: "boolean", default: false }
+
+  # ── MUSIC ────────────────────────────────────────────────────────
+  - name: "music"
+    label: "Music"
+    files:
+      - name: "music"
+        label: "Albums & Video"
+        file: "_data/music.json"
+        format: json
+        fields:
+          - label: "Albums"
+            name: "albums"
+            widget: "list"
+            summary: "{{fields.title}} ({{fields.year}})"
+            fields:
+              - { label: "Album Title", name: "title", widget: "string" }
+              - { label: "Year", name: "year", widget: "string" }
+              - { label: "Format", name: "format", widget: "string", hint: "e.g. CD / Cassette / Digital" }
+              - { label: "Album Art", name: "art_url", widget: "image", required: false }
+              - { label: "Buy / Stream Link", name: "buy_url", widget: "string", required: false }
+              - { label: "Coming Soon (no art yet)", name: "coming_soon", widget: "boolean", default: false }
+          - label: "Music Video"
+            name: "video"
+            widget: "object"
+            fields:
+              - { label: "YouTube Video ID", name: "youtube_id", widget: "string", required: false, hint: "Just the ID from the URL — e.g. dQw4w9WgXcQ" }
+              - { label: "Caption", name: "caption", widget: "string", default: "Latest Music Video" }

@@ -1,0 +1,16 @@
+{
+  "albums": [
+    {
+      "title": "Downtown",
+      "year": "2026",
+      "format": "CD / Cassette / Digital",
+      "art_url": "",
+      "buy_url": "",
+      "coming_soon": true
+    }
+  ],
+  "video": {
+    "youtube_id": "",
+    "caption": "Latest Music Video — coming soon"
+  }
+}
