@@ -6,6 +6,13 @@
       "city": "Brooklyn, NY",
       "ticket_url": "",
       "sold_out": false
+    },
+    {
+      "sold_out": false,
+      "date": "April 3, 2026",
+      "venue": "Berlin Under",
+      "city": "Manhattan, New York",
+      "ticket_url": "https://www.ticketweb.com/event/pipe-strays-talkhouse-berlin-tickets/14852323?pl=berlin"
     }
   ]
 }
