@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Talkhouse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,600&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f5f5f5;
+      --bg2: #e0e0e0;
+      --ink: #111111;
+      --muted: #666666;
+      --accent: #7a1a1a;
+      --accent2: #5c1111;
+      --border: #cccccc;
+      --card-bg: #ffffff;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--ink);
+      color: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 54px;
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .nav-logo {
+      font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--bg);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 0;
+      list-style: none;
+      align-items: center;
+      height: 100%;
+    }
+
+    .nav-links li { position: relative; height: 100%; display: flex; align-items: center; }
+
+    .nav-links a, .nav-links button {
+      color: var(--bg);
+      text-decoration: none;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0 1.1rem;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .nav-links a:hover, .nav-links button:hover {
+      color: var(--accent);
+    }
+
+    /* Merch dropdown */
+    .dropdown { position: relative; }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: var(--ink);
+      border: 1px solid var(--accent);
+      border-top: none;
+      min-width: 140px;
+      z-index: 200;
+    }
+
+    .dropdown:hover .dropdown-menu { display: block; }
+
+    .dropdown-menu a {
+      display: block;
+      height: auto;
+      padding: 0.6rem 1.1rem;
+      font-size: 0.68rem;
+      border-bottom: 1px solid #2a2520;
+    }
+
+    .dropdown-menu a:last-child { border-bottom: none; }
+
+    .nav-cart {
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--bg);
+      text-decoration: none;
+      padding: 0 0.8rem;
+      opacity: 0.7;
+      transition: opacity 0.15s;
+    }
+    .nav-cart:hover { opacity: 1; color: var(--accent); }
+
+    .listen-btn {
+      display: inline-block;
+      font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #fff;
+      background: var(--accent);
+      border: 2px solid var(--accent);
+      padding: 0.45rem 1.3rem;
+      border-radius: 999px;
+      text-decoration: none;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .listen-btn:hover {
+      background: transparent;
+      color: #fff;
+      border-color: #fff;
+    }
+
+    /* ── HERO ── */
+    #home {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/7;
+      overflow: hidden;
+      background: var(--ink);
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .hero-slideshow {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .hero-slide {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 1.2s ease-in-out;
+    }
+
+    .hero-slide.active {
+      opacity: 0.92;
+    }
+
+    .hero-placeholder {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 40%, #2a0505 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-placeholder-text {
+      font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+      font-size: clamp(5rem, 18vw, 16rem);
+      color: rgba(255,255,255,0.07);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-align: center;
+      padding: 1rem;
+      line-height: 1;
+      user-select: none;
+    }
+
+    .hero-overlay {
+      position: relative;
+      z-index: 2;
+      padding: 2.5rem 3rem;
+      width: 100%;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero-title {
+      font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+      font-size: clamp(5rem, 12vw, 10rem);
+      color: var(--bg);
+      line-height: 0.9;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+    }
+
+    .hero-sub {
+      margin-top: 0.6rem;
+      color: rgba(240,235,227,0.7);
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    /* ── SECTION LABELS ── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 3rem 2.5rem 1.5rem;
+    }
+
+    .section-label {
+      font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+      font-size: 2.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── MERCH GRID ── */
+    #merch { background: var(--bg); padding-bottom: 4rem; }
+
+    .merch-filter {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0 2.5rem 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border: 1px solid var(--border);
+      background: none;
+      color: var(--muted);
+      padding: 0.35rem 0.9rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--ink);
+      color: var(--bg);
+      border-color: var(--ink);
+    }
+
+    .merch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.5px;
+      padding: 0 2.5rem;
+      background: var(--border);
+    }
+
+    .merch-card {
+      background: var(--card-bg);
+      cursor: pointer;
+      transition: transform 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .merch-card:hover { transform: translateY(-3px); z-index: 2; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+
+    .merch-img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      display: block;
+      background: var(--bg2);
+      filter: grayscale(10%);
+    }
+
+    .merch-img-placeholder {
+      width: 100%;
+      aspect-ratio: 1;
+      background: var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+      color: var(--border);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .merch-info {
+      padding: 0.9rem 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .merch-name {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      color: var(--ink);
+      margin-bottom: 0.3rem;
+      line-height: 1.3;
+    }
+
+    .merch-price {
+      font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+      font-size: 1rem;
+      color: var(--accent);
+    }
+
+    .sold-out-badge {
+      position: absolute;
+      top: 0.7rem;
+      right: 0.7rem;
+      background: var(--ink);
+      color: var(--bg);
+      font-size: 0.55rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+    }
+
+    /* ── MUSIC VIDEO ── */
+    #music { background: var(--ink); padding: 4rem 2.5rem; color: var(--bg); }
+
+    .music-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .music-section-label {
+      font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+      font-size: 2.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--bg);
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .music-section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.15);
+    }
+
+    .discography {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .album-card {
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .album-card:hover { transform: translateY(-4px); }
+
+    .coming-soon-badge {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      border: 1px dashed rgba(255,255,255,0.2);
+    }
+
+    .album-art {
+      width: 100%;
+      aspect-ratio: 1;
+      background: #1a1a1a;
+      border: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      margin-bottom: 0.8rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .album-art img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .album-year {
+      font-size: 0.6rem;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+
+    .album-title {
+      font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--bg);
+      line-height: 1.1;
+    }
+
+    .album-format {
+      font-size: 0.6rem;
+      color: rgba(240,235,227,0.45);
+      margin-top: 0.2rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .video-wrapper {
+      position: relative;
+      aspect-ratio: 16/9;
+      background: #000;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .video-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      color: rgba(240,235,227,0.35);
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .video-placeholder:hover { color: rgba(240,235,227,0.7); }
+
+    .play-icon {
+      width: 56px;
+      height: 56px;
+      border: 1.5px solid currentColor;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .play-icon::after {
+      content: '';
+      width: 0;
+      height: 0;
+      border-top: 10px solid transparent;
+      border-bottom: 10px solid transparent;
+      border-left: 18px solid currentColor;
+      margin-left: 4px;
+    }
+
+    .video-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .video-caption {
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(240,235,227,0.4);
+      margin-top: 0.7rem;
+    }
+
+    /* ── SHOWS ── */
+    #shows { background: var(--bg2); padding: 4rem 2.5rem; }
+
+    .tour-inner { max-width: 800px; }
+
+    .tour-list { display: flex; flex-direction: column; gap: 0; margin-top: 0.5rem; }
+
+    .tour-row {
+      display: grid;
+      grid-template-columns: 110px 1fr auto;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1.1rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tour-row:first-child { border-top: 1px solid var(--border); }
+
+    .tour-date {
+      font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+      font-size: 0.85rem;
+      
+      color: var(--accent);
+    }
+
+    .tour-venue { font-size: 0.75rem; color: var(--ink); line-height: 1.4; }
+    .tour-city { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 0.1rem; }
+
+    .tickets-btn {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border: 1px solid var(--ink);
+      background: none;
+      color: var(--ink);
+      padding: 0.45rem 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .tickets-btn:hover { background: var(--ink); color: var(--bg); }
+
+    .tour-empty {
+      font-size: 0.75rem;
+      color: var(--muted);
+      
+      padding: 2rem 0;
+    }
+
+    /* ── ABOUT ── */
+    #about { background: var(--bg); padding: 4rem 2.5rem; }
+
+    .about-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      max-width: 1000px;
+      align-items: start;
+    }
+
+    .about-photo {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      filter: grayscale(15%) contrast(1.05);
+      background: var(--bg2);
+      display: block;
+    }
+
+    .about-photo-placeholder {
+      width: 100%;
+      aspect-ratio: 3/4;
+      background: var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+      color: var(--border);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border: 1px dashed var(--border);
+    }
+
+    .about-text { padding-top: 0.5rem; }
+
+    .about-band-name {
+      font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+      font-size: 3.5rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin-bottom: 1.5rem;
+      line-height: 0.95;
+    }
+
+    .about-bio {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.9;
+      margin-bottom: 1.5rem;
+    }
+
+    .about-bio p + p { margin-top: 1rem; }
+
+    .social-links {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+
+    .social-link {
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .social-link:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* ── NEWSLETTER ── */
+    .newsletter {
+      background: var(--ink);
+      color: var(--bg);
+      padding: 3rem 2.5rem;
+      text-align: center;
+    }
+
+    .newsletter-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .newsletter-title {
+      font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+      font-size: 2.2rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--bg);
+      margin-bottom: 1.2rem;
+    }
+
+    .newsletter-form {
+      display: flex;
+      gap: 0;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .newsletter-input {
+      flex: 1;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-right: none;
+      color: var(--bg);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      padding: 0.75rem 1rem;
+      outline: none;
+    }
+
+    .newsletter-input::placeholder { color: rgba(240,235,227,0.3); }
+
+    .newsletter-submit {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: var(--accent);
+      color: #fff;
+      border: 1px solid var(--accent);
+      padding: 0.75rem 1.2rem;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    .newsletter-submit:hover { background: #5c1111; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--ink);
+      border-top: 1px solid #2a2520;
+      padding: 2rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(240,235,227,0.4);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .footer-links a:hover { color: var(--bg); }
+
+    .footer-copy {
+      font-size: 0.6rem;
+      color: rgba(240,235,227,0.25);
+      letter-spacing: 0.08em;
+    }
+
+    /* ── UTILITY ── */
+    .hidden { display: none !important; }
+
+    @media (max-width: 700px) {
+      .about-inner { grid-template-columns: 1fr; }
+      .tour-row { grid-template-columns: 90px 1fr; }
+      .tour-row .tickets-btn { grid-column: 2; }
+      .hero-overlay { padding: 1.5rem; }
+      nav { padding: 0 1rem; }
+      .merch-grid { padding: 0 1rem; }
+      .section-header, #shows, #about, #music, .newsletter { padding-left: 1rem; padding-right: 1rem; }
+    }
+  </style>
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <a href="#home" class="nav-logo">Talkhouse</a>
+  <ul class="nav-links">
+    <li><a href="#home">Home</a></li>
+    <li class="dropdown">
+      <button>Merch ▾</button>
+      <div class="dropdown-menu">
+        <a href="#merch">All</a>
+        <a href="#merch" onclick="filterMerch('apparel')">Apparel</a>
+        <a href="#merch" onclick="filterMerch('music')">Music</a>
+        <a href="#merch" onclick="filterMerch('misc')">Misc</a>
+      </div>
+    </li>
+    <li><a href="#music">Music</a></li>
+    <li><a href="#shows">Shows</a></li>
+    <li><a href="#about">About</a></li>
+  </ul>
+  <a href="#" class="nav-cart">Cart (0)</a>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="home">
+  <div class="hero-slideshow">
+
+  </div>
+  </div>
+  <div class="hero-overlay">
+    <a href="#music" class="listen-btn">&#9654; Listen Now</a>
+  </div>
+</section>
+
+<!-- ── MERCH ── -->
+<section id="merch">
+  <div class="section-header">
+    <h2 class="section-label">Merch</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="merch-filter">
+    <button class="filter-btn active" onclick="filterMerch('all')">All</button>
+    <button class="filter-btn" onclick="filterMerch('apparel')">Apparel</button>
+    <button class="filter-btn" onclick="filterMerch('music')">Music</button>
+    <button class="filter-btn" onclick="filterMerch('misc')">Misc</button>
+  </div>
+
+  <div class="merch-grid" id="merch-grid">
+
+    <!-- APPAREL -->
+
+
+
+    <!-- MUSIC -->
+
+    <!-- MISC -->
+
+
+  </div>
+</section>
+
+<!-- ── MUSIC / DISCOGRAPHY ── -->
+<section id="music">
+  <div class="music-inner">
+    <h2 class="music-section-label">Music</h2>
+
+    <div class="discography">
+    </div>
+
+    <!-- VIDEO — paste a YouTube embed URL below -->
+    <div class="video-wrapper" id="video-wrapper">
+      <div class="video-placeholder" onclick="showComingSoon(event)" style="cursor:pointer;">
+        <div class="play-icon"></div>
+        <span>Watch Latest Music Video</span>
+      </div>
+    </div>
+    <p class="video-caption">Latest Music Video — coming soon</p>
+  </div>
+</section>
+
+<!-- ── SHOWS ── -->
+<section id="shows">
+  <div class="section-header" style="padding-left:0; padding-top:0;">
+    <h2 class="section-label">Shows</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="tour-inner">
+    <div class="tour-list" id="tour-list">
+
+      <!-- Add your actual tour dates below. Remove or duplicate rows as needed. -->
+
+
+      <!-- No dates? Uncomment this:
+      <p class="tour-empty">No upcoming dates. Check back soon.</p>
+      -->
+
+    </div>
+  </div>
+</section>
+
+<!-- ── ABOUT ── -->
+<section id="about">
+  <div class="section-header">
+    <h2 class="section-label">About</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="about-inner" style="grid-template-columns: 1fr;">
+    <div class="about-text">
+      <h3 class="about-band-name">Talkhouse</h3>
+      <div class="about-bio">
+      </div>
+      <div class="social-links">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── NEWSLETTER ── -->
+<div class="newsletter">
+  <div class="newsletter-label">Stay in the loop</div>
+  <h3 class="newsletter-title">Be the first to know about new music, merch & shows.</h3>
+  <div class="newsletter-form">
+    <input class="newsletter-input" type="email" placeholder="your@email.com" />
+    <button class="newsletter-submit">Subscribe</button>
+  </div>
+</div>
+
+<!-- ── COMING SOON MODAL ── -->
+<div id="coming-soon-modal" style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.75); align-items:center; justify-content:center;">
+  <div style="background:var(--ink); border:2px solid var(--accent); padding:3rem 2.5rem; text-align:center; max-width:360px; width:90%;">
+    <div style="font-family:'Bebas Neue','Barlow Condensed',sans-serif; font-size:2.5rem; color:var(--bg); letter-spacing:0.1em; margin-bottom:0.5rem;">Coming Soon</div>
+    <p style="color:var(--muted); font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:2rem;">Stay tuned — this link is on its way.</p>
+    <button onclick="closeComingSoon()" style="font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; background:var(--accent); color:#fff; border:none; padding:0.6rem 1.8rem; cursor:pointer;">Close</button>
+  </div>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-copy">© 2026 Talkhouse</div>
+</footer>
+
+<script>
+  // ── Coming Soon Modal ──
+  function showComingSoon(e) {
+    e.preventDefault();
+    const modal = document.getElementById('coming-soon-modal');
+    modal.style.display = 'flex';
+  }
+  function closeComingSoon() {
+    document.getElementById('coming-soon-modal').style.display = 'none';
+  }
+  document.getElementById('coming-soon-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeComingSoon();
+  });
+
+  // ── Merch filter ──
+  function filterMerch(cat) {
+    const cards = document.querySelectorAll('.merch-card');
+    const btns = document.querySelectorAll('.filter-btn');
+
+    btns.forEach(b => b.classList.remove('active'));
+    btns.forEach(b => {
+      if (b.textContent.trim().toLowerCase() === cat || (cat === 'all' && b.textContent.trim() === 'All')) {
+        b.classList.add('active');
+      }
+    });
+
+    cards.forEach(c => {
+      if (cat === 'all' || c.dataset.cat === cat) {
+        c.classList.remove('hidden');
+      } else {
+        c.classList.add('hidden');
+      }
+    });
+  }
+
+  // ── Video lazy load ──
+  function loadVideo() {
+    const wrapper = document.getElementById('video-wrapper');
+    // Replace YOUR_VIDEO_ID with your actual YouTube video ID
+    wrapper.innerHTML = '<iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID?autoplay=1" allowfullscreen allow="autoplay"></iframe>';
+  }
+
+  // ── Smooth nav scroll ──
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  // ── Hero slideshow ──
+  (function() {
+    const slides = document.querySelectorAll('.hero-slide');
+    let current = 0;
+    setInterval(() => {
+      slides[current].classList.remove('active');
+      current = (current + 1) % slides.length;
+      slides[current].classList.add('active');
+    }, 20000);
+  })();
+
+
+  document.querySelector('.newsletter-submit').addEventListener('click', () => {
+    const input = document.querySelector('.newsletter-input');
+    const email = input.value;
+    if (email && email.includes('@')) {
+      fetch('https://script.google.com/macros/s/AKfycbz8IK5T1d40rh_FCtGLIzvHtG0TO8UmluBpkL6VwfXE4J1grXZeBijM26Uz-3W4UN4b/exec', {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'email=' + encodeURIComponent(email)
+      });
+      input.value = '';
+      input.placeholder = 'You\'re on the list ✓';
+    } else {
+      input.placeholder = 'Please enter a valid email';
+    }
+  });
+  // ── DATA-DRIVEN RENDERING ──────────────────────────────────────────
+// Paste this block into index.html just before the closing </script> tag.
+// It replaces all hard-coded section content with fetches from /_data/.
+
+(async function () {
+
+  // ── Helpers ──
+  function comingSoonAttr() {
+    return 'onclick="showComingSoon(event)" href="#"';
+  }
+
+  async function load(path) {
+    try {
+      const r = await fetch(path);
+      if (!r.ok) return null;
+      return await r.json();
+    } catch { return null; }
+  }
+
+  // ── HERO ──────────────────────────────────────────────────────────
+  const hero = await load('/_data/hero.json');
+  if (hero) {
+    // Slides
+    const slideshow = document.querySelector('.hero-slideshow');
+    if (slideshow && hero.slides && hero.slides.length) {
+      slideshow.innerHTML = hero.slides.map((s, i) => `
+        <div class="hero-slide${i === 0 ? ' active' : ''}"
+             style="background-image:url('${s.image_url}')"
+             aria-label="${s.alt || ''}"></div>
+      `).join('');
+    }
+    // CTA button
+    const cta = document.querySelector('.listen-btn');
+    if (cta) {
+      cta.textContent = '▶ ' + (hero.cta_label || 'Listen Now');
+      if (hero.cta_url) cta.href = hero.cta_url;
+    }
+    // Tagline
+    const sub = document.querySelector('.hero-sub');
+    if (sub && hero.tagline) sub.textContent = hero.tagline;
+  }
+
+  // ── BIO ───────────────────────────────────────────────────────────
+  const bio = await load('/_data/bio.json');
+  if (bio) {
+    const bioEl = document.querySelector('.about-bio');
+    if (bioEl && bio.bio) {
+      bioEl.innerHTML = bio.bio.map(p => `<p>${typeof p === 'object' ? p.value : p}</p>`).join('');
+    }
+    const nameEl = document.querySelector('.about-band-name');
+    if (nameEl && bio.band_name) nameEl.textContent = bio.band_name;
+
+    const socialEl = document.querySelector('.social-links');
+    if (socialEl && bio.social_links) {
+      socialEl.innerHTML = bio.social_links.map(l => {
+        const attrs = l.active && l.url
+          ? `href="${l.url}" ${l.url.startsWith('http') ? 'target="_blank"' : ''}`
+          : comingSoonAttr();
+        return `<a ${attrs} class="social-link">${l.label}</a>`;
+      }).join('');
+    }
+  }
+
+  // ── SHOWS ─────────────────────────────────────────────────────────
+  const showsData = await load('/_data/shows.json');
+  const tourList = document.getElementById('tour-list');
+  if (tourList && showsData && showsData.shows) {
+    if (showsData.shows.length === 0) {
+      tourList.innerHTML = '<p class="tour-empty">No upcoming dates. Check back soon.</p>';
+    } else {
+      tourList.innerHTML = showsData.shows.map(s => {
+        const ticketAttrs = s.sold_out
+          ? 'class="tickets-btn" style="opacity:0.4;pointer-events:none;"'
+          : s.ticket_url
+            ? `href="${s.ticket_url}" target="_blank" class="tickets-btn"`
+            : `${comingSoonAttr()} class="tickets-btn"`;
+        const label = s.sold_out ? 'Sold Out' : 'Tickets';
+        return `
+      <div class="tour-row">
+        <div class="tour-date">${s.date}</div>
+        <div>
+          <div class="tour-venue">${s.venue}</div>
+          <div class="tour-city">${s.city}</div>
+        </div>
+        <a ${ticketAttrs}>${label}</a>
+      </div>
+        `;
+      }).join('');
+    }
+  }
+
+  // ── MERCH ─────────────────────────────────────────────────────────
+  const merch = await load('/_data/merch.json');
+  const merchGrid = document.getElementById('merch-grid');
+  if (merchGrid && merch && merch.items) {
+    merchGrid.innerHTML = merch.items.map(item => {
+      const img = item.image_url
+        ? `<img class="merch-img" src="${item.image_url}" alt="${item.name}" />`
+        : `<div class="merch-img-placeholder">Photo Coming Soon</div>`;
+      const badge = item.sold_out ? `<div class="sold-out-badge">Sold Out</div>` : '';
+      const cardAttrs = !item.sold_out && item.buy_url
+        ? `onclick="window.open('${item.buy_url}','_blank')"`
+        : !item.sold_out ? comingSoonAttr().replace('href="#"','') : '';
+      return `
+      <div class="merch-card" data-cat="${item.category}" ${cardAttrs}>
+        ${badge}
+        ${img}
+        <div class="merch-info">
+          <div class="merch-name">${item.name}</div>
+          <div class="merch-price">$${item.price}</div>
+        </div>
+      </div>
+      `;
+    }).join('');
+  }
+
+  // ── MUSIC ─────────────────────────────────────────────────────────
+  const music = await load('/_data/music.json');
+  if (music) {
+    // Albums
+    const disco = document.querySelector('.discography');
+    if (disco && music.albums) {
+      disco.innerHTML = music.albums.map(a => {
+        const artInner = a.coming_soon || !a.art_url
+          ? `<span class="coming-soon-badge">Coming Soon</span>`
+          : `<img src="${a.art_url}" alt="${a.title}" />`;
+        return `
+      <div class="album-card"${a.buy_url ? ` onclick="window.open('${a.buy_url}','_blank')" style="cursor:pointer"` : ''}>
+        <div class="album-art">${artInner}</div>
+        <div class="album-year">${a.year}</div>
+        <div class="album-title">${a.title}</div>
+        <div class="album-format">${a.format}</div>
+      </div>
+        `;
+      }).join('');
+    }
+    // Video
+    if (music.video) {
+      const caption = document.querySelector('.video-caption');
+      if (caption && music.video.caption) caption.textContent = music.video.caption;
+      if (music.video.youtube_id) {
+        // Override the loadVideo function to use the CMS-managed ID
+        window.loadVideo = function () {
+          const wrapper = document.getElementById('video-wrapper');
+          wrapper.innerHTML = `<iframe src="https://www.youtube.com/embed/${music.video.youtube_id}?autoplay=1" allowfullscreen allow="autoplay"></iframe>`;
+        };
+      }
+    }
+  }
+
+})();
+</script>
+</body>
+</html>

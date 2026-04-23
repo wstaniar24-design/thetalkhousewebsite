@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Talkhouse — Admin</title>
+
+  <!-- Netlify Identity Widget -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+  <!-- Google Fonts (matching main site) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,600&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── VARIABLES (mirror main site) ── */
+    :root {
+      --bg: #f5f5f5;
+      --bg2: #e0e0e0;
+      --ink: #111111;
+      --muted: #666666;
+      --accent: #7a1a1a;
+      --accent2: #5c1111;
+      --border: #cccccc;
+      --card-bg: #ffffff;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── LOADING SCREEN (shown while CMS boots) ── */
+    #cms-loading {
+      position: fixed;
+      inset: 0;
+      background: var(--ink);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      transition: opacity 0.6s ease;
+    }
+
+    #cms-loading.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-logo {
+      font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+      font-size: clamp(3rem, 10vw, 7rem);
+      letter-spacing: 0.12em;
+      color: var(--bg);
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    .loading-sub {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .loading-bar-wrap {
+      width: 200px;
+      height: 1px;
+      background: rgba(255,255,255,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loading-bar-fill {
+      position: absolute;
+      inset: 0;
+      background: var(--accent);
+      transform: translateX(-100%);
+      animation: loadbar 1.6s ease forwards;
+    }
+
+    @keyframes loadbar {
+      to { transform: translateX(0); }
+    }
+
+    /* ── HEADER BAR (sits above the CMS UI) ── */
+    #cms-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 54px;
+      background: var(--ink);
+      border-bottom: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      z-index: 5000; /* above Decap's panels */
+      pointer-events: none; /* let CMS buttons through */
+    }
+
+    .cms-header-logo {
+      font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--bg);
+      pointer-events: auto;
+      text-decoration: none;
+    }
+
+    .cms-header-badge {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 0.25rem 0.7rem;
+      pointer-events: none;
+    }
+
+    /* ── DECAP CMS ROOT — push it down below our header ── */
+    #nc-root {
+      margin-top: 54px !important;
+      min-height: calc(100vh - 54px);
+    }
+
+    /* ── DECAP STYLE OVERRIDES ── */
+
+    /* App bar / top chrome */
+    [class*="AppHeader"],
+    [class*="app-header"],
+    header[class*="css-"] {
+      background: #1a1a1a !important;
+      border-bottom: 1px solid rgba(122,26,26,0.4) !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+    }
+
+    /* Sidebar nav */
+    [class*="CollectionView"],
+    [class*="Sidebar"],
+    aside,
+    nav[class*="css-"] {
+      background: #161616 !important;
+      border-right: 1px solid rgba(122,26,26,0.3) !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+    }
+
+    /* Collection nav items */
+    [class*="NavLink"],
+    [class*="nav-link"] {
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.68rem !important;
+      letter-spacing: 0.12em !important;
+      text-transform: uppercase !important;
+    }
+
+    /* Buttons */
+    button[class*="css-"] {
+      font-family: 'IBM Plex Mono', monospace !important;
+      letter-spacing: 0.08em !important;
+    }
+
+    /* Save / publish buttons */
+    [class*="PublishButton"],
+    [class*="Button"][class*="primary"] {
+      background: var(--accent) !important;
+      border-color: var(--accent) !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+    }
+
+    /* Headings in editor */
+    [class*="EditorToolbar"] h1,
+    [class*="EditorToolbar"] h2 {
+      font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif !important;
+      letter-spacing: 0.1em !important;
+    }
+
+    /* ── DECAP GLOBAL FONT INJECTION ── */
+    body {
+      font-family: 'IBM Plex Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading screen -->
+  <div id="cms-loading">
+    <div class="loading-logo">Talkhouse</div>
+    <div class="loading-sub">Admin Panel</div>
+    <div class="loading-bar-wrap">
+      <div class="loading-bar-fill"></div>
+    </div>
+  </div>
+
+  <!-- Persistent header -->
+  <div id="cms-header">
+    <a class="cms-header-logo" href="/">Talkhouse</a>
+    <span class="cms-header-badge">Admin</span>
+  </div>
+
+  <!-- Decap CMS mounts here -->
+  <div id="nc-root"></div>
+
+  <!-- Decap CMS -->
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+
+  <script>
+    // ── Netlify Identity redirect handling ──
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.on('init', function(user) {
+        if (!user) {
+          window.netlifyIdentity.on('login', function() {
+            document.location.href = '/admin/';
+          });
+        }
+      });
+    }
+
+    // ── Remove loading screen once CMS is interactive ──
+    (function() {
+      var minWait = new Promise(function(res) { setTimeout(res, 1400); });
+      var cmsMounted = new Promise(function(res) {
+        var ob = new MutationObserver(function() {
+          if (document.querySelector('#nc-root *')) { ob.disconnect(); res(); }
+        });
+        ob.observe(document.getElementById('nc-root'), { childList: true, subtree: true });
+      });
+
+      Promise.all([minWait, cmsMounted]).then(function() {
+        var el = document.getElementById('cms-loading');
+        if (el) {
+          el.classList.add('fade-out');
+          setTimeout(function() { el.remove(); }, 700);
+        }
+      });
+    })();
+  </script>
+
+</body>
+</html>

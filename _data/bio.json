@@ -1,0 +1,16 @@
+{
+  "band_name": "Talkhouse",
+  "bio": [
+    "Blending head-slamming highs and tear-jerking lows, TALKHOUSE offers carefully crafted lyrics, melodies, and riffs for listeners who enjoy complexity but still know when to let go and just have fun.",
+    "A product of New York, TALKHOUSE has been tearing up stages like Arlene's Grocery, selling out the Bitter End, and headlining Mercury Lounge and more.",
+    "Stay tuned for their debut single Downtown, releasing May 10th."
+  ],
+  "social_links": [
+    { "label": "Instagram", "url": "https://www.instagram.com/talkhousetheband", "active": true },
+    { "label": "Spotify", "url": "", "active": false },
+    { "label": "Bandcamp", "url": "", "active": false },
+    { "label": "Apple Music", "url": "", "active": false },
+    { "label": "YouTube", "url": "https://www.youtube.com/channel/UCilp7lwaTzlpMZM6K-gdgKQ", "active": true },
+    { "label": "Contact", "url": "mailto:talkhousetheband@gmail.com", "active": true }
+  ]
+}
